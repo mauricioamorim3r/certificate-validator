@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registo de Análise Crítica - App</title>
+    <!-- Google Fonts: Roboto para um visual limpo e moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Ícones de Font Awesome para um visual de aplicativo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bibliotecas para Geração de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Firebase SDK (para Firestore e Auth) -->
+    <script type="module">
+        // Importa as funções necessárias do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, doc, getDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variáveis globais de configuração do Firebase (serão preenchidas pelo ambiente Canvas)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null; // Para armazenar o utilizador autenticado
+
+        // Autenticação no Firebase
+        async function authenticateFirebase() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Firebase autenticado.");
+            } catch (error) {
+                console.error("Erro na autenticação Firebase:", error);
+                alert("Erro ao conectar ao Firebase. Verifique a consola.");
+            }
+        }
+
+        // Observa o estado da autenticação e define o utilizador atual
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                console.log("Utilizador Firebase:", user.uid);
+                const userIdDisplay = document.getElementById('firebase_user_id');
+                if (userIdDisplay) {
+                    userIdDisplay.textContent = `Utilizador: ${user.uid}`;
+                }
+                loadLatestRecord();
+            } else {
+                console.log("Nenhum utilizador Firebase registado.");
+                const userIdDisplay = document.getElementById('firebase_user_id');
+                 if (userIdDisplay) {
+                    userIdDisplay.textContent = `Utilizador: Anónimo`;
+                }
+            }
+        });
+
+        // Função para guardar dados no Firestore
+        window.saveRecordToFirestore = async function(recordData) {
+            if (!currentUser) {
+                alert("Erro: Utilizador não autenticado para guardar dados.");
+                return;
+            }
+            try {
+                const recordsCollectionRef = collection(db, `artifacts/${appId}/users/${currentUser.uid}/cert_records`);
+                
+                const docRef = await addDoc(recordsCollectionRef, {
+                    ...recordData,
+                    timestamp: new Date()
+                });
+                console.log("Documento guardado com ID:", docRef.id);
+                alert("Registo guardado no Firestore com sucesso!");
+            } catch (e) {
+                console.error("Erro ao adicionar documento: ", e);
+                alert("Erro ao guardar registo no Firestore.");
+            }
+        };
+
+        // Função para carregar o último registo do Firestore
+        window.loadLatestRecord = async function() {
+            if (!currentUser) {
+                console.warn("Não há utilizador autenticado para carregar registos.");
+                return;
+            }
+            try {
+                const recordsCollectionRef = collection(db, `artifacts/${appId}/users/${currentUser.uid}/cert_records`);
+                const q = query(recordsCollectionRef, orderBy('timestamp', 'desc'), limit(1));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const latestRecord = querySnapshot.docs[0].data();
+                    console.log("Último registo carregado:", latestRecord);
+                    fillFormWithData(latestRecord);
+                    alert("Último registo carregado do Firestore!");
+                } else {
+                    console.log("Nenhum registo encontrado para este utilizador.");
+                    alert("Nenhum registo anterior encontrado no Firestore. Comece um novo!");
+                }
+            } catch (e) {
+                console.error("Erro ao carregar documento: ", e);
+                alert("Erro ao carregar o último registo do Firestore.");
+            }
+        };
+
+        // Função para preencher o formulário com dados carregados
+        function fillFormWithData(data) {
+            document.getElementById('data_analise').value = data.data_analise || '';
+            document.getElementById('analisado_por').value = data.analisado_por || '';
+            document.getElementById('aprovado_por').value = data.aprovado_por || '';
+
+            // Seção 1
+            document.getElementById('num_certificado_id').value = data.identificacao_certificado_laboratorio.numero_certificado || '';
+            document.getElementById('lab_emissor_id').value = data.identificacao_certificado_laboratorio.laboratorio_emissor || '';
+            document.getElementById('data_emissao_id').value = data.identificacao_certificado_laboratorio.data_emissao || '';
+            document.getElementById('data_calibracao_id').value = data.identificacao_certificado_laboratorio.data_calibracao || '';
+            document.getElementById('validade_calibracao_id').value = data.identificacao_certificado_laboratorio.validade_calibracao.valor || '';
+            document.getElementById('obs_validade_calibracao').value = data.identificacao_certificado_laboratorio.validade_calibracao.observacoes || '';
+            if (data.identificacao_certificado_laboratorio.validade_calibracao.status) {
+                document.querySelector(`input[name="status_validade_calibracao"][value="${data.identificacao_certificado_laboratorio.validade_calibracao.status}"]`).checked = true;
+            }
+            document.getElementById('responsavel_tecnico_id').value = data.identificacao_certificado_laboratorio.responsavel_tecnico.nome || '';
+            if (data.identificacao_certificado_laboratorio.responsavel_tecnico.status) {
+                document.querySelector(`input[name="status_responsavel_tecnico"][value="${data.identificacao_certificado_laboratorio.responsavel_tecnico.status}"]`).checked = true;
+            }
+            document.getElementById('obs_responsavel_tecnico').value = data.identificacao_certificado_laboratorio.responsavel_tecnico.observacoes || '';
+
+            // Seção 2
+            if (data.acreditacao_escopo.laboratorio_acreditado_cgcre_inmetro.status) {
+                document.querySelector(`input[name="lab_acreditado"][value="${data.acreditacao_escopo.laboratorio_acreditado_cgcre_inmetro.status}"]`).checked = true;
+            }
+            document.getElementById('obs_lab_acreditado').value = data.acreditacao_escopo.laboratorio_acreditado_cgcre_inmetro.observacoes || '';
+            if (data.acreditacao_escopo.escopo_acreditacao_adequado.status) {
+                document.querySelector(`input[name="escopo_adequado"][value="${data.acreditacao_escopo.escopo_acreditacao_adequado.status}"]`).checked = true;
+            }
+            document.getElementById('obs_escopo_adequado').value = data.acreditacao_escopo.escopo_acreditacao_adequado.observacoes || '';
+            if (data.acreditacao_escopo.simbolo_acreditacao_presente.status) {
+                document.querySelector(`input[name="simbolo_presente"][value="${data.acreditacao_escopo.simbolo_acreditacao_presente.status}"]`).checked = true;
+            }
+            document.getElementById('obs_simbolo_presente').value = data.acreditacao_escopo.simbolo_acreditacao_presente.observacoes || '';
+            
+            // Seção 3
+            document.getElementById('tipo_equipamento').value = data.identificacao_instrumento.tipo_equipamento || '';
+            document.getElementById('fabricante_modelo').value = data.identificacao_instrumento.fabricante_modelo || '';
+            document.getElementById('numero_serie').value = data.identificacao_instrumento.numero_serie || '';
+            document.getElementById('tag_id_interno').value = data.identificacao_instrumento.tag_id_interno || '';
+            document.getElementById('aplicacao').value = data.identificacao_instrumento.aplicacao || '';
+            document.getElementById('localizacao').value = data.identificacao_instrumento.localizacao || '';
+
+            // Seção 4
+            document.getElementById('temp_reportada').value = data.condicoes_ambientais_metodo_calibracao.temperatura.valor_reportado || '';
+            document.getElementById('temp_limite').value = data.condicoes_ambientais_metodo_calibracao.temperatura.limite_aceitavel || '';
+            document.getElementById('temp_ok').checked = data.condicoes_ambientais_metodo_calibracao.temperatura.ok || false;
+            document.getElementById('temp_obs').value = data.condicoes_ambientais_metodo_calibracao.temperatura.observacoes_impacto || '';
+            
+            document.getElementById('umidade_reportada').value = data.condicoes_ambientais_metodo_calibracao.umidade_relativa.valor_reportado || '';
+            document.getElementById('umidade_limite').value = data.condicoes_ambientais_metodo_calibracao.umidade_relativa.limite_aceitavel || '';
+            document.getElementById('umidade_ok').checked = data.condicoes_ambientais_metodo_calibracao.umidade_relativa.ok || false;
+            document.getElementById('umidade_obs').value = data.condicoes_ambientais_metodo_calibracao.umidade_relativa.observacoes_impacto || '';
+
+            document.getElementById('pressao_reportada').value = data.condicoes_ambientais_metodo_calibracao.pressao_atmosferica.valor_reportado || '';
+            document.getElementById('pressao_limite').value = data.condicoes_ambientais_metodo_calibracao.pressao_atmosferica.limite_aceitavel || '';
+            document.getElementById('pressao_ok').checked = data.condicoes_ambientais_metodo_calibracao.pressao_atmosferica.ok || false;
+            document.getElementById('pressao_obs').value = data.condicoes_ambientais_metodo_calibracao.pressao_atmosferica.observacoes_impacto || '';
+            
+            document.getElementById('fluido_cal_reportado').value = data.condicoes_ambientais_metodo_calibracao.fluido_calibracao.valor_reportado || '';
+            document.getElementById('fluido_cal_limite').value = data.condicoes_ambientais_metodo_calibracao.fluido_calibracao.limite_aceitavel || '';
+            document.getElementById('fluido_cal_ok').checked = data.condicoes_ambientais_metodo_calibracao.fluido_calibracao.ok || false;
+            document.getElementById('fluido_cal_obs').value = data.condicoes_ambientais_metodo_calibracao.fluido_calibracao.observacoes_impacto || '';
+
+            if (data.condicoes_ambientais_metodo_calibracao.local_calibracao.tipo) {
+                document.querySelector(`input[name="local_calibracao"][value="${data.condicoes_ambientais_metodo_calibracao.local_calibracao.tipo}"]`).checked = true;
+            }
+            document.getElementById('local_cal_ok').checked = data.condicoes_ambientais_metodo_calibracao.local_calibracao.ok || false;
+            document.getElementById('local_cal_obs').value = data.condicoes_ambientais_metodo_calibracao.local_calibracao.observacoes || '';
+
+            document.getElementById('metodo_utilizado_val').value = data.condicoes_ambientais_metodo_calibracao.metodo_utilizado.nome_codigo || '';
+            document.getElementById('metodo_utilizado_ok').checked = data.condicoes_ambientais_metodo_calibracao.metodo_utilizado.ok || false;
+            document.getElementById('metodo_utilizado_obs').value = data.condicoes_ambientais_metodo_calibracao.metodo_utilizado.observacoes || '';
+
+
+            // Seção 5
+            document.getElementById('req1').checked = data.elementos_essenciais_iso_iec_17025.identificacao_inequivoca_item || false;
+            document.getElementById('req2').checked = data.elementos_essenciais_iso_iec_17025.identificacao_laboratorio || false;
+            document.getElementById('req3').checked = data.elementos_essenciais_iso_iec_17025.data_calibracao || false;
+            document.getElementById('req4').checked = data.elementos_essenciais_iso_iec_17025.metodo_utilizado || false;
+            document.getElementById('req5').checked = data.elementos_essenciais_iso_iec_17025.resultados_unidades_apropriadas || false;
+            document.getElementById('req6').checked = data.elementos_essenciais_iso_iec_17025.incerteza_medicao_declarada || false;
+            document.getElementById('req7').checked = data.elementos_essenciais_iso_iec_17025.rastreabilidade_evidenciada || false;
+            document.getElementById('req8').checked = data.elementos_essenciais_iso_iec_17025.condicoes_ambientais_informadas || false;
+            document.getElementById('req9').checked = data.elementos_essenciais_iso_iec_17025.declaracao_nao_reproducao_parcial || false;
+            document.getElementById('req10').checked = data.elementos_essenciais_iso_iec_17025.assinatura_responsavel_autorizado || false;
+
+            // Seção 6 (dinâmica)
+            const padroesTableBody = document.getElementById('padroes_table').getElementsByTagName('tbody')[0];
+            padroesTableBody.innerHTML = ''; // Limpa as linhas existentes
+            padraoRowCounter = -1; // Reinicia o contador para carregamento
+            data.rastreabilidade_metrologica_incerteza_padroes.forEach((item, index) => {
+                padraoRowCounter = index; // Define o contador para o índice atual para nomeação consistente
+                const newRow = padroesTableBody.insertRow();
+                newRow.innerHTML = `
+                    <td><input type="text" name="padrao_utilizado_${index}" value="${item.padrao_utilizado || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="cert_padrao_${index}" value="${item.certificado_padrao || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="lab_calibrador_padrao_${index}" value="${item.laboratorio_calibrador_padrao || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="num_acreditacao_padrao_${index}" value="${item.acreditacao || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="incerteza_padrao_${index}" value="${item.incerteza_padrao_k2 || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="date" name="validade_padrao_${index}" value="${item.validade_padrao || ''}" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_padrao_${index}" value="OK" ${item.status === 'OK' ? 'checked' : ''}><label>OK</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_padrao_${index}" value="NOK" ${item.status === 'NOK' ? 'checked' : ''}><label>NOK</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_padrao_${index}" value="${item.observacoes_justificativa || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+            });
+            padraoRowCounter = data.rastreabilidade_metrologica_incerteza_padroes.length > 0 ? data.rastreabilidade_metrologica_incerteza_padroes.length - 1 : -1;
+
+
+            // Seção 7
+            document.getElementById('incerteza_declarada_val').value = data.avaliacao_incerteza_medicao_certificado.incerteza_expandida_declarada.valor_evidencia || '';
+            document.getElementById('incerteza_declarada_ok').checked = data.avaliacao_incerteza_medicao_certificado.incerteza_expandida_declarada.ok || false;
+            document.getElementById('incerteza_declarada_obs').value = data.avaliacao_incerteza_medicao_certificado.incerteza_expandida_declarada.comentarios_justificativa || '';
+
+            document.getElementById('metodo_calculo_val').value = data.avaliacao_incerteza_medicao_certificado.metodo_calculo_gum_nit_dicla_021.status || '';
+            document.getElementById('metodo_calculo_ok').checked = data.avaliacao_incerteza_medicao_certificado.metodo_calculo_gum_nit_dicla_021.ok || false;
+            document.getElementById('metodo_calculo_obs').value = data.avaliacao_incerteza_medicao_certificado.metodo_calculo_gum_nit_dicla_021.comentarios_justificativa || '';
+
+            document.getElementById('contribuicoes_val').value = data.avaliacao_incerteza_medicao_certificado.todas_contribuicoes_relevantes_considered.status || '';
+            document.getElementById('contribuicoes_ok').checked = data.avaliacao_incerteza_medicao_certificado.todas_contribuicoes_relevantes_considered.ok || false;
+            document.getElementById('contribuicoes_obs').value = data.avaliacao_incerteza_medicao_certificado.todas_contribuicoes_relevantes_considered.comentarios_justificativa || '';
+
+            document.getElementById('nivel_confianca_val').value = data.avaliacao_incerteza_medicao_certificado.nivel_confianca_95.valor_evidencia || '';
+            document.getElementById('nivel_confianca_ok').checked = data.avaliacao_incerteza_medicao_certificado.nivel_confianca_95.ok || false;
+            document.getElementById('nivel_confianca_obs').value = data.avaliacao_incerteza_medicao_certificado.nivel_confianca_95.comentarios_justificativa || '';
+
+            document.getElementById('compatibilidade_val').value = data.avaliacao_incerteza_medicao_certificado.compatibilidade_limite_aplicacao.status || '';
+            document.getElementById('compatibilidade_ok').checked = data.avaliacao_incerteza_medicao_certificado.compatibilidade_limite_aplicacao.ok || false;
+            document.getElementById('compatibilidade_obs').value = data.avaliacao_incerteza_medicao_certificado.compatibilidade_limite_aplicacao.comentarios_justificativa || '';
+
+            // Seção 8 (dinâmica)
+            const resultadosTableBody = document.getElementById('resultados_table').getElementsByTagName('tbody')[0];
+            resultadosTableBody.innerHTML = ''; // Limpa as linhas existentes
+            resultadoRowCounter = -1; // Reinicia o contador para carregamento
+            data.resultados_calibracao_faixa_operacional.pontos_calibracao.forEach((item, index) => {
+                resultadoRowCounter = index;
+                const newRow = resultadosTableBody.insertRow();
+                newRow.innerHTML = `
+                    <td><input type="text" name="ponto_res_${index}" value="${item.ponto || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="valor_ref_res_${index}" value="${item.valor_ref || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="valor_medido_res_${index}" value="${item.valor_medido || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="erro_res_${index}" value="${item.erro || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="incerteza_res_${index}" value="${item.incerteza || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="limite_erro_res_${index}" value="${item.limite_erro_permitido || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="ok_res_${index}" name="ok_res_${index}_checkbox" ${item.ok ? 'checked' : ''}><label for="ok_res_${index}"></label></div></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+            });
+            resultadoRowCounter = data.resultados_calibracao_faixa_operacional.pontos_calibracao.length > 0 ? data.resultados_calibracao_faixa_operacional.pontos_calibracao.length - 1 : -1;
+
+
+            document.getElementById('faixa_calibracao_reportada').value = data.resultados_calibracao_faixa_operacional.faixa_calibracao_reportada || '';
+            document.getElementById('faixa_operacional_instrumento').value = data.resultados_calibracao_faixa_operacional.faixa_operacional_instrumento || '';
+            document.getElementById('comentarios_resultados').value = data.resultados_calibracao_faixa_operacional.comentarios_resultados || '';
+
+            // Seção 9
+            if (data.analise_ajuste_reparo.resultados_as_found.presentes) {
+                document.querySelector(`input[name="as_found"][value="${data.analise_ajuste_reparo.resultados_as_found.presentes}"]`).checked = true;
+            }
+            document.getElementById('obs_as_found').value = data.analise_ajuste_reparo.resultados_as_found.observacoes || '';
+            if (data.analise_ajuste_reparo.resultados_as_left.presentes) {
+                document.querySelector(`input[name="as_left"][value="${data.analise_ajuste_reparo.resultados_as_left.presentes}"]`).checked = true;
+            }
+            document.getElementById('obs_as_left').value = data.analise_ajuste_reparo.resultados_as_left.observacoes || '';
+            if (data.analise_ajuste_reparo.ajustes_executados.status) {
+                document.querySelector(`input[name="ajustes_executados"][value="${data.analise_ajuste_reparo.ajustes_executados.status}"]`).checked = true;
+            }
+            document.getElementById('obs_ajustes_executados').value = data.analise_ajuste_reparo.ajustes_executados.observacoes || '';
+            document.getElementById('acoes_retroativas').value = data.analise_ajuste_reparo.acoes_retroativas || '';
+
+            // Seção 10
+            if (data.declaracao_conformidade_regras_decisao.declaracao_presente.status) {
+                document.querySelector(`input[name="declaracao_presente"][value="${data.declaracao_conformidade_regras_decisao.declaracao_presente.status}"]`).checked = true;
+            }
+            document.getElementById('evidencia_declaracao_presente').value = data.declaracao_conformidade_regras_decisao.declaracao_presente.evidencia_comentarios || '';
+            if (data.declaracao_conformidade_regras_decisao.especificacao_limite_explicitado.status) {
+                document.querySelector(`input[name="especificacao_limite"][value="${data.declaracao_conformidade_regras_decisao.especificacao_limite_explicitado.status}"]`).checked = true;
+            }
+            document.getElementById('evidencia_especificacao_limite').value = data.declaracao_conformidade_regras_decisao.especificacao_limite_explicitado.evidencia_comentarios || '';
+            if (data.declaracao_conformidade_regras_decisao.regra_decisao_documentada.status) {
+                document.querySelector(`input[name="regra_decisao"][value="${data.declaracao_conformidade_regras_decisao.regra_decisao_documentada.status}"]`).checked = true;
+            }
+            document.getElementById('evidencia_regra_decisao').value = data.declaracao_conformidade_regras_decisao.regra_decisao_documentada.evidencia_comentarios || '';
+            if (data.declaracao_conformidade_regras_decisao.nivel_risco_declarado.status) {
+                document.querySelector(`input[name="nivel_risco"][value="${data.declaracao_conformidade_regras_decisao.nivel_risco_declarado.status}"]`).checked = true;
+            }
+            document.getElementById('evidencia_nivel_risco').value = data.declaracao_conformidade_regras_decisao.nivel_risco_declarado.evidencia_comentarios || '';
+
+            // Seção 11
+            document.getElementById('temp_uso_val').value = data.condicoes_ambientais_pos_calibracao_uso.temperatura.valor || '';
+            document.getElementById('temp_uso_limite').value = data.condicoes_ambientais_pos_calibracao_uso.temperatura.limite_aceitavel || '';
+            document.getElementById('temp_uso_ok').checked = data.condicoes_ambientais_pos_calibracao_uso.temperatura.ok || false;
+            document.getElementById('temp_uso_obs').value = data.condicoes_ambientais_pos_calibracao_uso.observacoes_impacto || ''; // Corrigido para usar .observacoes_impacto
+
+            document.getElementById('umidade_uso_val').value = data.condicoes_ambientais_pos_calibracao_uso.umidade_relativa.valor || '';
+            document.getElementById('umidade_uso_limite').value = data.condicoes_ambientais_pos_calibracao_uso.umidade_relativa.limite_aceitavel || '';
+            document.getElementById('umidade_uso_ok').checked = data.condicoes_ambientais_pos_calibracao_uso.umidade_relativa.ok || false;
+            document.getElementById('umidade_uso_obs').value = data.condicoes_ambientais_pos_calibracao_uso.umidade_relativa.observacoes_impacto || '';
+
+            document.getElementById('pressao_uso_val').value = data.condicoes_ambientais_pos_calibracao_uso.pressao_atmosferica.valor || '';
+            document.getElementById('pressao_uso_limite').value = data.condicoes_ambientais_pos_calibracao_uso.pressao_atmosferica.limite_aceitavel || '';
+            document.getElementById('pressao_uso_ok').checked = data.condicoes_ambientais_pos_calibracao_uso.pressao_atmosferica.ok || false;
+            document.getElementById('pressao_uso_obs').value = data.condicoes_ambientais_pos_calibracao_uso.pressao_atmosferica.observacoes_impacto || '';
+
+            document.getElementById('fluido_uso_val').value = data.condicoes_ambientais_pos_calibracao_uso.fluido_operacao.valor || '';
+            document.getElementById('fluido_uso_limite').value = data.condicoes_ambientais_pos_calibracao_uso.fluido_operacao.limite_aceitavel || '';
+            document.getElementById('fluido_uso_ok').checked = data.condicoes_ambientais_pos_calibracao_uso.fluido_operacao.ok || false;
+            document.getElementById('fluido_uso_obs').value = data.condicoes_ambientais_pos_calibracao_uso.fluido_operacao.observacoes_impacto || '';
+
+
+            // Seção 12
+            document.getElementById('data_ultima_calibracao').value = data.periodicidade_calibracao.data_ultima_calibracao || '';
+            document.getElementById('intervalo_realizado').value = data.periodicidade_calibracao.intervalo_realizado_meses || '';
+            document.getElementById('periodicidade_definida').value = data.periodicidade_calibracao.periodicidade_definida_meses || '';
+            if (data.periodicidade_calibracao.atende_periodicidade) {
+                document.querySelector(`input[name="periodicidade_atende"][value="${data.periodicidade_calibracao.atende_periodicidade}"]`).checked = true;
+            }
+            document.getElementById('obs_periodicidade_definida').value = data.periodicidade_calibracao.comentarios_otimizacao || '';
+
+
+            // Seção 13 (dinâmica - medidores de pressão e vazão)
+            const pressaoTableBody = document.getElementById('pressao_table').getElementsByTagName('tbody')[0];
+            pressaoTableBody.innerHTML = ''; // Limpa as linhas existentes
+            pressaoCritCounter = -1; // Reinicia o contador para carregamento
+            data.avaliacoes_especificas_tipo_instrumento.medidores_pressao.forEach((item, index) => {
+                pressaoCritCounter = index;
+                const newRow = pressaoTableBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${item.criterio.nome || ''}</td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${index}" value="Sim" ${item.criterio.status === 'Sim' ? 'checked' : ''}><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${index}" value="Nao" ${item.criterio.status === 'Nao' ? 'checked' : ''}><label>Não</label></div>
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${index}" value="N/A" ${item.criterio.status === 'N/A' ? 'checked' : ''}><label>N/A</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_pressao_criterio_${index}" value="${item.criterio.observacoes_justificativa || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+            });
+            pressaoCritCounter = data.avaliacoes_especificas_tipo_instrumento.medidores_pressao.length > 0 ? data.avaliacoes_especificas_tipo_instrumento.medidores_pressao.length -1 : -1;
+
+
+            const vazaoTableBody = document.getElementById('vazao_table').getElementsByTagName('tbody')[0];
+            vazaoTableBody.innerHTML = ''; // Limpa as linhas existentes
+            vazaoCritCounter = -1; // Reinicia o contador para carregamento
+            data.avaliacoes_especificas_tipo_instrumento.medidores_vazao.forEach((item, index) => {
+                vazaoCritCounter = index;
+                const newRow = vazaoTableBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${item.criterio.nome || ''}</td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${index}" value="Sim" ${item.criterio.status === 'Sim' ? 'checked' : ''}><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${index}" value="Nao" ${item.criterio.status === 'Nao' ? 'checked' : ''}><label>Não</label></div>
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${index}" value="N/A" ${item.criterio.status === 'N/A' ? 'checked' : ''}><label>N/A</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_vazao_criterio_${index}" value="${item.criterio.observacoes_justificativa || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+            });
+            vazaoCritCounter = data.avaliacoes_especificas_tipo_instrumento.medidores_vazao.length > 0 ? data.avaliacoes_especificas_tipo_instrumento.medidores_vazao.length -1 : -1;
+
+
+            // Seção 14 (Análise do Sistema de Medição de Óleo)
+            if (data.analise_parametros_sistema_medicao_oleo) {
+                document.getElementById('relatorio_incerteza_sistema').value = data.analise_parametros_sistema_medicao_oleo.relatorio_incerteza_sistema || '';
+                document.getElementById('incerteza_sistema_valor').value = data.analise_parametros_sistema_medicao_oleo.incerteza_global_sistema.valor || '';
+                document.getElementById('incerteza_sistema_criterio').value = data.analise_parametros_sistema_medicao_oleo.incerteza_global_sistema.criterio_adotado || '';
+                if (data.analise_parametros_sistema_medicao_oleo.status_conformidade_sistema_incerteza) {
+                    document.querySelector(`input[name="status_incerteza_sistema"][value="${data.analise_parametros_sistema_medicao_oleo.status_conformidade_sistema_incerteza}"]`).checked = true;
+                }
+                document.getElementById('obs_incerteza_sistema').value = data.analise_parametros_sistema_medicao_oleo.obs_incerteza_sistema || '';
+                
+                if (data.analise_parametros_sistema_medicao_oleo.bsw_considerado) {
+                    document.querySelector(`input[name="bsw_considerado"][value="${data.analise_parametros_sistema_medicao_oleo.bsw_considerado}"]`).checked = true;
+                }
+                document.getElementById('bsw_contribuicao').value = data.analise_parametros_sistema_medicao_oleo.bsw_contribuicao || '';
+                document.getElementById('obs_bsw').value = data.analise_parametros_sistema_medicao_oleo.obs_bsw || '';
+                document.getElementById('componentes_influenciadores').value = data.analise_parametros_sistema_medicao_oleo.componentes_influenciadores ? data.analise_parametros_sistema_medicao_oleo.componentes_influenciadores.join('\n') : '';
+                document.getElementById('classe_exatidao_sistema').value = data.analise_parametros_sistema_medicao_oleo.classe_exatidao_sistema || '';
+                document.getElementById('criterio_classe_adotado').value = data.analise_parametros_sistema_medicao_oleo.criterio_classe_adotado || '';
+                if (data.analise_parametros_sistema_medicao_oleo.resultado_avaliacao_classe) {
+                    document.querySelector(`input[name="resultado_classe_sistema"][value="${data.analise_parametros_sistema_medicao_oleo.resultado_avaliacao_classe}"]`).checked = true;
+                }
+                document.getElementById('obs_classe_sistema').value = data.analise_parametros_sistema_medicao_oleo.obs_classe_sistema || '';
+
+                const condOpSysTableBody = document.getElementById('condicoes_operacionais_sistema_table').getElementsByTagName('tbody')[0];
+                condOpSysTableBody.innerHTML = ''; // Limpa as linhas existentes
+                condOpSysCounter = -1; // Reinicia o contador para carregamento
+                if (data.analise_parametros_sistema_medicao_oleo.condicoes_operacionais_adotadas_sistema) {
+                    data.analise_parametros_sistema_medicao_oleo.condicoes_operacionais_adotadas_sistema.forEach((item, index) => {
+                        condOpSysCounter = index;
+                        const newRow = condOpSysTableBody.insertRow();
+                        newRow.innerHTML = `
+                            <td><input type="text" name="sys_op_grandeza_${index}" value="${item.grandeza || ''}" style="width: calc(100% - 20px);"></td>
+                            <td><input type="text" name="sys_op_val_${index}" value="${item.valor || ''}" style="width: calc(100% - 20px);"></td>
+                            <td><input type="text" name="sys_op_unid_${index}" value="${item.unidade || ''}" style="width: calc(100% - 20px);"></td>
+                            <td><input type="text" name="sys_op_obs_${index}" value="${item.observacoes || ''}" style="width: calc(100% - 20px);"></td>
+                            <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                        `;
+                    });
+                }
+                condOpSysCounter = data.analise_parametros_sistema_medicao_oleo.condicoes_operacionais_adotadas_sistema.length > 0 ? data.analise_parametros_sistema_medicao_oleo.condicoes_operacionais_adotadas_sistema.length -1 : -1;
+            }
+
+
+            // Seção 15 (Não Conformidades)
+            const ncTableBody = document.getElementById('nao_conformidades_table').getElementsByTagName('tbody')[0];
+            ncTableBody.innerHTML = ''; // Limpa as linhas existentes
+            ncRowCounter = -1; // Reinicia o contador para carregamento
+            data.nao_conformidades_acoes_propostas.forEach((item, index) => {
+                ncRowCounter = index;
+                const newRow = ncTableBody.insertRow();
+                newRow.innerHTML = `
+                    <td><input type="number" name="nc_item_${index}" value="${item.item || ''}" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="nc_descricao_${index}" value="${item.descricao || ''}" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <select name="nc_criticidade_${index}" style="width: calc(100% - 20px);">
+                            <option value="Alta" ${item.criticidade === 'Alta' ? 'selected' : ''}>Alta</option>
+                            <option value="Media" ${item.criticidade === 'Media' ? 'selected' : ''}>Média</option>
+                            <option value="Baixa" ${item.criticidade === 'Baixa' ? 'selected' : ''}>Baixa</option>
+                        </select>
+                    </td>
+                    <td><textarea name="nc_acao_${index}" style="width: calc(100% - 20px); min-height: 40px;">${item.acao_proposta || ''}</textarea></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+            });
+            ncRowCounter = data.nao_conformidades_acoes_propostas.length > 0 ? data.nao_conformidades_acoes_propostas.length -1 : -1;
+
+            document.getElementById('recomendacoes_adicionais').value = data.recomendacoes_adicionais ? data.recomendacoes_adicionais.join('\n') : '';
+
+            // Seção 16
+            if (data.aptidao_uso_conclusao_final.erro_dentro_limites.avaliacao) {
+                document.querySelector(`input[name="erro_limites"][value="${data.aptidao_uso_conclusao_final.erro_dentro_limites.avaliacao}"]`).checked = true;
+            }
+            document.getElementById('obs_erro_limites').value = data.aptidao_uso_conclusao_final.erro_dentro_limites.observacoes || '';
+            if (data.aptidao_uso_conclusao_final.incerteza_adequada.avaliacao) {
+                document.querySelector(`input[name="incerteza_adequada"][value="${data.aptidao_uso_conclusao_final.incerteza_adequada.avaliacao}"]`).checked = true;
+            }
+            document.getElementById('obs_incerteza_adequada').value = data.aptidao_uso_conclusao_final.incerteza_adequada.observacoes || '';
+            if (data.aptidao_uso_conclusao_final.requisitos_rtm_atendidos.avaliacao) {
+                document.querySelector(`input[name="requisitos_rtm"][value="${data.aptidao_uso_conclusao_final.requisitos_rtm_atendidos.avaliacao}"]`).checked = true;
+            }
+            document.getElementById('obs_requisitos_rtm').value = data.aptidao_uso_conclusao_final.requisitos_rtm_atendidos.observacoes || '';
+            if (data.aptidao_uso_conclusao_final.status_final) {
+                document.querySelector(`input[name="status_final"][value="${data.aptidao_uso_conclusao_final.status_final}"]`).checked = true;
+            }
+            document.getElementById('justificativa_conclusao').value = data.aptidao_uso_conclusao_final.justificativa_conclusao || '';
+
+            // Seção 17
+            document.getElementById('assinatura_analista_nome').value = data.assinaturas.analista.nome || '';
+            document.getElementById('assinatura_analista_data').value = data.assinaturas.analista.data || '';
+            document.getElementById('assinatura_aprovador_nome').value = data.assinaturas.aprovador.nome || '';
+            document.getElementById('assinatura_aprovador_data').value = data.assinaturas.aprovador.data || '';
+
+            // Seção 18
+            document.getElementById('anexo_certificado_pdf').checked = data.anexos_referencias.copia_certificado_pdf || false;
+            document.getElementById('anexo_certificados_padroes').checked = data.anexos_referencias.copia_certificados_padroes || false;
+            document.getElementById('anexo_historico_calibracoes').checked = data.anexos_referencias.historico_calibracoes || false;
+            document.getElementById('anexo_requisitos_internos').checked = data.anexos_referencias.documento_requisitos_internos || false;
+            document.getElementById('anexo_outros').value = data.anexos_referencias.outros || '';
+        }
+
+        // Garante que a autenticação Firebase seja chamada assim que o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', authenticateFirebase);
+    </script>
+</body>
+</html>
