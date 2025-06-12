@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Análise Crítica - App</title>
+    <!-- Google Fonts: Roboto para um visual limpo e moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Ícones de Font Awesome para um visual de aplicativo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bibliotecas para Geração de PDF -->
+    <!-- html2canvas para capturar o conteúdo HTML como imagem -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF para criar o arquivo PDF a partir da imagem -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Estilos Globais e Layout do Contêiner Principal */
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            background-color: #eef2f6; /* Fundo suave para "cara de aplicativo" */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinhar o conteúdo ao topo */
+            min-height: 100vh; /* Ocupar a altura total da viewport */
+            padding: 20px;
+            box-sizing: border-box; /* Incluir padding e borda no tamanho total */
+        }
+        .app-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px; /* Cantos mais arredondados */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Sombra mais pronunciada */
+            max-width: 900px;
+            width: 100%;
+            margin: auto; /* Centralizar na página */
+            box-sizing: border-box;
+            border-top: 5px solid #007bff; /* Detalhe visual na cor primária */
+        }
+
+        /* Estilos de Títulos */
+        h1 {
+            font-size: 2.2em;
+            color: #007bff; /* Cor primária */
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700; /* Mais negrito */
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0; /* Linha divisória mais fina */
+            padding-bottom: 10px;
+            margin-top: 35px;
+            margin-bottom: 25px;
+            font-weight: 500;
+            display: flex; /* Para alinhar ícone com texto */
+            align-items: center;
+        }
+        h2 i {
+            margin-right: 10px; /* Espaçamento entre ícone e texto */
+            color: #007bff; /* Cor do ícone */
+        }
+
+        /* Estilo para a seção de propósito */
+        .purpose {
+            background-color: #e6f7ff; /* Fundo azul claro */
+            border-left: 6px solid #007bff; /* Borda esquerda colorida */
+            padding: 18px;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #0056b3;
+            border-radius: 6px;
+        }
+
+        /* Estilos de Formulário: Grupos de Input e Labels */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: calc(100% - 22px); /* Ajuste para padding e borda */
+            padding: 12px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transições suaves */
+        }
+        /* Estilos de Foco para Inputs */
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Sombra de foco */
+            outline: none; /* Remover outline padrão do navegador */
+        }
+        textarea {
+            resize: vertical; /* Permitir redimensionamento vertical */
+            min-height: 80px;
+        }
+
+        /* Estilos para Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            background-color: #f9f9f9; /* Fundo leve para tabelas */
+            border-radius: 8px;
+            overflow: hidden; /* Garantir que cantos arredondados funcionem com bordas */
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        th {
+            background-color: #e9f5ff; /* Fundo para cabeçalho de tabela */
+            color: #0056b3;
+            font-weight: 600;
+        }
+
+        /* Estilos para Botões */
+        .button-group {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .btn {
+            background-color: #007bff; /* Cor primária */
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Transições suaves */
+            display: inline-flex; /* Para alinhar ícone com texto */
+            align-items: center;
+            margin: 0 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3; /* Cor primária mais escura no hover */
+            transform: translateY(-2px); /* Efeito de elevação */
+        }
+        .btn i {
+            margin-right: 10px; /* Espaçamento entre ícone e texto do botão */
+        }
+        .btn-secondary {
+            background-color: #6c757d; /* Cor secundária para outros botões */
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Estilo para a caixa de "Filtro Crítico" */
+        .critical-box {
+            background-color: #fff8e1; /* Amarelo claro */
+            border-left: 5px solid #ffc107; /* Borda esquerda amarela */
+            padding: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .critical-box p {
+            margin: 0;
+            color: #6d4c41;
+        }
+
+        /* Layout Flexível para Linhas de Formulário */
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap; /* Permitir quebra de linha em telas menores */
+            gap: 20px; /* Espaçamento entre os elementos flex */
+        }
+        .flex-row > div {
+            flex: 1; /* Para que os itens se estiquem */
+            min-width: 280px; /* Tamanho mínimo antes de quebrar a linha */
+        }
+        .half-width {
+            flex: 0 0 calc(50% - 10px); /* Ocupa metade da largura com gap de 20px */
+        }
+        .third-width {
+            flex: 0 0 calc(33.333% - 14px); /* Ocupa um terço da largura com gap */
+        }
+
+        /* Informações de Rodapé */
+        .footer-info {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.85em;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        /* Estilos Personalizados para Checkboxes e Radio Buttons (para visual de aplicativo) */
+        .custom-checkbox input[type="checkbox"],
+        .custom-radio input[type="radio"] {
+            display: none; /* Esconder o input nativo */
+        }
+
+        .custom-checkbox label,
+        .custom-radio label {
+            display: inline-flex; /* Para alinhar o pseudo-elemento com o texto */
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f8f8;
+            transition: all 0.2s ease;
+            font-weight: normal; /* Sobrescreve o estilo de label padrão se necessário */
+        }
+
+        .custom-checkbox label:before,
+        .custom-radio label:before {
+            content: ''; /* Criar um pseudo-elemento para o visual do checkbox/radio */
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 4px; /* Cantos para checkboxes */
+            margin-right: 8px;
+            background-color: #fff;
+            transition: all 0.2s ease;
+            box-sizing: border-box; /* Incluir borda no tamanho */
+        }
+
+        .custom-radio label:before {
+            border-radius: 50%; /* Redondo para radio buttons */
+        }
+
+        /* Estilo para Checkbox MARCADO */
+        .custom-checkbox input[type="checkbox"]:checked + label:before {
+            background-color: #007bff; /* Fundo azul quando marcado */
+            border-color: #007bff;
+            content: '\2713'; /* Símbolo de 'tick' (✓) */
+            color: #fff;
+            text-align: center;
+            line-height: 18px; /* Centraliza o tick */
+            font-size: 12px; /* Tamanho do tick */
+        }
+
+        /* Estilo para Radio Button MARCADO */
+        .custom-radio input[type="radio"]:checked + label:before {
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: inset 0 0 0 5px #fff; /* Ponto central branco */
+        }
+
+        /* Estilo de Hover para Checkbox/Radio */
+        .custom-checkbox label:hover,
+        .custom-radio label:hover {
+            border-color: #007bff;
+            background-color: #e9f5ff; /* Fundo azul claro no hover */
+        }
+
+        /* Ajustes para grupos de status (pequenos radios) */
+        .status-choice {
+            display: flex;
+            gap: 10px; /* Espaçamento entre as opções */
+            margin-top: 5px;
+        }
+        .status-choice .custom-radio label {
+            padding: 5px 10px; /* Padding menor */
+            font-size: 0.9em;
+        }
+        .status-choice .custom-radio label:before {
+            width: 14px;
+            height: 14px;
+            min-width: 14px; /* Evita encolhimento */
+            line-height: 14px;
+        }
+        .status-choice .custom-radio input[type="radio"]:checked + label:before {
+            box-shadow: inset 0 0 0 4px #fff; /* Ponto central menor */
+        }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            .btn {
+                width: 100%; /* Botões ocupam a largura total em telas pequenas */
+                margin: 10px 0;
+            }
+            .flex-row > div {
+                min-width: 100%; /* Itens flex ocupam a largura total */
+            }
+            .half-width, .third-width {
+                flex: 0 0 100%; /* Metade/Terço da largura também ocupam a largura total */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>REGISTRO DE ANÁLISE CRÍTICA – CERTIFICADOS DE CALIBRAÇÃO / RELATÓRIOS DE INSPEÇÃO</h1>
+
+        <p><strong>Documento:</strong> RAC-001</p>
+        <p><strong>Versão:</strong> 2.1</p>
+        <div class="form-group"><label for="data_analise"><strong>Data:</strong></label><input type="date" id="data_analise"></div>
+        <div class="form-group"><label for="analisado_por"><strong>Analisado por:</strong></label><input type="text" id="analisado_por"></div>
+        <div class="form-group"><label for="aprovado_por"><strong>Aprovado por:</strong></label><input type="text" id="aprovado_por"></div>
+
+        <div class="purpose">
+            <p><strong>Propósito</strong>: Este registro tem como objetivo padronizar a avaliação crítica de certificados de calibração e relatórios de inspeção, assegurando a conformidade com a Portaria INMETRO 291/2021, a norma ISO/IEC 17025, o Guia para a Expressão da Incerteza de Medição (GUM) e outros padrões metrológicos pertinentes. O foco é validar a adequação metrológica e a aptidão para uso do instrumento em sua aplicação específica.</p>
+        </div>
+
+        <h2><i class="fas fa-file-alt"></i> 1. IDENTIFICAÇÃO DO CERTIFICADO E LABORATÓRIO</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Valor</th>
+                    <th>Verificação / Status</th>
+                    <th>Observações / Evidências</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Número do Certificado</strong></td>
+                    <td><input type="text" id="num_certificado_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_num_certificado" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_num_certificado" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_num_certificado" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Laboratório Emissor</strong></td>
+                    <td><input type="text" id="lab_emissor_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_lab_emissor" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_lab_emissor" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_lab_emissor" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Data de Emissão</strong></td>
+                    <td><input type="date" id="data_emissao_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_data_emissao" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_data_emissao" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_data_emissao" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Data da Calibração</strong></td>
+                    <td><input type="date" id="data_calibracao_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_data_calibracao" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_data_calibracao" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_data_calibracao" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Validade da Calibração</strong></td>
+                    <td><input type="date" id="validade_calibracao_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_validade_calibracao" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_validade_calibracao" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_validade_calibracao" placeholder="Ex: Calculado conforme [Referência da Norma/Procedimento Interno]" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Responsável Técnico</strong></td>
+                    <td><input type="text" id="responsavel_tecnico_id" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_responsavel_tecnico" value="Conforme" checked><label>Conforme</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_responsavel_tecnico" value="Nao Conforme"><label>Não Conforme</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_responsavel_tecnico" placeholder="Ex: Verificar registro de acreditação." style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="critical-box">
+            <h2><i class="fas fa-certificate"></i> 2. ACREDITAÇÃO E ESCOPO DO LABORATÓRIO</h2>
+            <p>Esta seção é o <em>primeiro filtro crítico</em>. Não conformidades aqui podem inviabilizar o certificado.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Critério</th>
+                        <th>Status</th>
+                        <th>Observações / Justificativa (detalhar o "porquê")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Laboratório Acreditado (Cgcre/Inmetro)</strong></td>
+                        <td>
+                            <div class="status-choice">
+                                <div class="custom-radio"><input type="radio" name="lab_acreditado" value="Sim" checked><label>Sim</label></div>
+                                <div class="custom-radio"><input type="radio" name="lab_acreditado" value="Nao"><label>Não</label></div>
+                            </div>
+                        </td>
+                        <td><input type="text" id="obs_lab_acreditado" placeholder="Nº Acreditação: [Preencher se Sim]. Evidência: Site Inmetro/Cgcre - Imagem/Link" style="width: calc(100% - 20px);"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Escopo de Acreditação Adequado</strong></td>
+                        <td>
+                            <div class="status-choice">
+                                <div class="custom-radio"><input type="radio" name="escopo_adequado" value="Sim" checked><label>Sim</label></div>
+                                <div class="custom-radio"><input type="radio" name="escopo_adequado" value="Nao"><label>Não</label></div>
+                            </div>
+                        </td>
+                        <td><input type="text" id="obs_escopo_adequado" placeholder="A faixa de calibração ([Faixa Calibrada]) e o tipo de serviço ([Tipo de Serviço]) estão abrangidos pelo escopo ([Nº do Escopo]) do laboratório." style="width: calc(100% - 20px);"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Símbolo de Acreditação Presente</strong></td>
+                        <td>
+                            <div class="status-choice">
+                                <div class="custom-radio"><input type="radio" name="simbolo_presente" value="Sim" checked><label>Sim</label></div>
+                                <div class="custom-radio"><input type="radio" name="simbolo_presente" value="Nao"><label>Não</label></div>
+                            </div>
+                        </td>
+                        <td><input type="text" id="obs_simbolo_presente" placeholder="Verificar presença do selo do Inmetro/Cgcre no certificado." style="width: calc(100% - 20px);"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2><i class="fas fa-cogs"></i> 3. IDENTIFICAÇÃO DO INSTRUMENTO</h2>
+        <div class="flex-row">
+            <div class="half-width">
+                <label for="tipo_equipamento"><strong>Tipo de Equipamento</strong></label>
+                <input type="text" id="tipo_equipamento" placeholder="Ex: Medidor Ultrassônico de Vazão">
+            </div>
+            <div class="half-width">
+                <label for="fabricante_modelo"><strong>Fabricante / Modelo</strong></label>
+                <input type="text" id="fabricante_modelo" placeholder="Ex: Siemens / SITRANS F US">
+            </div>
+            <div class="half-width">
+                <label for="numero_serie"><strong>Número de Série</strong></label>
+                <input type="text" id="numero_serie" placeholder="Ex: 123456789">
+            </div>
+            <div class="half-width">
+                <label for="tag_id_interno"><strong>TAG / ID Interno</strong></label>
+                <input type="text" id="tag_id_interno" placeholder="Ex: VAZ-001 / ID-123">
+            </div>
+            <div class="half-width">
+                <label for="aplicacao"><strong>Aplicação</strong></label>
+                <input type="text" id="aplicacao" placeholder="Ex: Fiscal - Medição de Gás Natural">
+            </div>
+            <div class="half-width">
+                <label for="localizacao"><strong>Localização</strong></label>
+                <input type="text" id="localizacao" placeholder="Ex: Ponto de Medição X - Unidade Y">
+            </div>
+        </div>
+
+        <h2><i class="fas fa-cloud"></i> 4. CONDIÇÕES AMBIENTAIS E MÉTODO DA CALIBRAÇÃO</h2>
+        <p>Verificação da adequação das condições durante a calibração.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Valor Reportado</th>
+                    <th>Limite Aceitável (se houver)</th>
+                    <th>OK?</th>
+                    <th>Observações / Impacto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Temperatura (°C)</strong></td>
+                    <td><input type="text" id="temp_reportada" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="temp_limite" placeholder="Ex: 20 ± 2 °C" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="temp_ok" name="temp_ok"><label for="temp_ok"></label></div></td>
+                    <td><input type="text" id="temp_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Umidade Relativa (%)</strong></td>
+                    <td><input type="text" id="umidade_reportada" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="umidade_limite" placeholder="Ex: 50 ± 10 %" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="umidade_ok" name="umidade_ok"><label for="umidade_ok"></label></div></td>
+                    <td><input type="text" id="umidade_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Pressão Atmosférica (kPa)</strong></td>
+                    <td><input type="text" id="pressao_reportada" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="pressao_limite" placeholder="Ex: 101.3 ± 5 kPa" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="pressao_ok" name="pressao_ok"><label for="pressao_ok"></label></div></td>
+                    <td><input type="text" id="pressao_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Fluido de Calibração</strong></td>
+                    <td><input type="text" id="fluido_cal_reportado" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="fluido_cal_limite" placeholder="Ex: Água / Ar Seco" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="fluido_cal_ok" name="fluido_cal_ok"><label for="fluido_cal_ok"></label></div></td>
+                    <td><input type="text" id="fluido_cal_obs" placeholder="Adequado para a aplicação do instrumento?" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Local da Calibração</strong></td>
+                    <td colspan="2">
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="local_calibracao" value="Laboratorio" checked><label>Laboratório</label></div>
+                            <div class="custom-radio"><input type="radio" name="local_calibracao" value="Campo"><label>Campo</label></div>
+                        </div>
+                    </td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="local_cal_ok" name="local_cal_ok"><label for="local_cal_ok"></label></div></td>
+                    <td><input type="text" id="local_cal_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Método Utilizado</strong></td>
+                    <td><input type="text" id="metodo_utilizado_val" style="width: calc(100% - 20px);"></td>
+                    <td></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="metodo_utilizado_ok" name="metodo_utilizado_ok"><label for="metodo_utilizado_ok"></label></div></td>
+                    <td><input type="text" id="metodo_utilizado_obs" placeholder="Verificar se o método é padrão e aplicável." style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-clipboard-check"></i> 5. ELEMENTOS ESSENCIAIS ISO/IEC 17025 (Checklist)</h2>
+        <p>Confirmação da aderência formal aos requisitos da norma. Marque <strong>✔</strong> quando o requisito estiver atendido e <strong>justifique "Não"</strong>.</p>
+        <div class="checklist">
+            <ul>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req1" name="req1"><label for="req1">Identificação inequívoca do item calibrado.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req2" name="req2"><label for="req2">Identificação do laboratório que executou a calibração.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req3" name="req3"><label for="req3">Data(s) da execução da calibração.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req4" name="req4"><label for="req4">Referência ao(s) método(s) utilizado(s).</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req5" name="req5"><label for="req5">Resultados com unidades de medição apropriadas.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req6" name="req6"><label for="req6">Incerteza de medição declarada.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req7" name="req7"><label for="req7">Evidência de rastreabilidade metrológica ao SI.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req8" name="req8"><label for="req8">Condições ambientais informadas no local da calibração.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req9" name="req9"><label for="req9">Declaração de que o relatório não deve ser reproduzido parcialmente.</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="req10" name="req10"><label for="req10">Assinatura e identificação do responsável autorizado pela emissão.</label></div></li>
+            </ul>
+        </div>
+
+        <h2><i class="fas fa-link"></i> 6. RASTREABILIDADE METROLÓGICA E INCERTEZA DOS PADRÕES</h2>
+        <p>Esta seção é crucial. Detalhar os padrões utilizados no laboratório, seus certificados de calibração, incertezas e validades, provando a cadeia metrológica.</p>
+        <table id="padroes_table">
+            <thead>
+                <tr>
+                    <th>Padrão Utilizado</th>
+                    <th>Certificado do Padrão</th>
+                    <th>Laboratório Calibrador do Padrão</th>
+                    <th>Nº Acreditação</th>
+                    <th>Incerteza do Padrão (k=2)</th>
+                    <th>Validade do Padrão</th>
+                    <th>Status</th>
+                    <th>Observações / Justificativa de Desvio</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="padrao_utilizado_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="cert_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="lab_calibrador_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="num_acreditacao_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="incerteza_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="date" name="validade_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="status_padrao_0" value="OK" checked><label>OK</label></div>
+                            <div class="custom-radio"><input type="radio" name="status_padrao_0" value="NOK"><label>NOK</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_padrao_0" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addPadraoRow()"><i class="fas fa-plus-circle"></i> Adicionar Padrão</button>
+
+        <h2><i class="fas fa-ruler-combined"></i> 7. AVALIAÇÃO DA INCERTEZA DE MEDIÇÃO DO CERTIFICADO</h2>
+        <p>Análise crítica da incerteza reportada.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Aspecto Avaliado</th>
+                    <th>Valor / Evidência</th>
+                    <th>OK?</th>
+                    <th>Comentários / Justificativa Técnica</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Incerteza Expandida (U) declarada</strong></td>
+                    <td><input type="text" id="incerteza_declarada_val" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="incerteza_declarada_ok" name="incerteza_declarada_ok"><label for="incerteza_declarada_ok"></label></div></td>
+                    <td><input type="text" id="incerteza_declarada_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Método de cálculo conforme GUM / NIT Dicla-021</strong></td>
+                    <td><input type="text" id="metodo_calculo_val" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="metodo_calculo_ok" name="metodo_calculo_ok"><label for="metodo_calculo_ok"></label></div></td>
+                    <td><input type="text" id="metodo_calculo_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Todas as contribuições relevantes consideradas</strong></td>
+                    <td><input type="text" id="contribuicoes_val" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="contribuicoes_ok" name="contribuicoes_ok"><label for="contribuicoes_ok"></label></div></td>
+                    <td><input type="text" id="contribuicoes_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Nível de confiança (geralmente 95 %)</strong></td>
+                    <td><input type="text" id="nivel_confianca_val" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="nivel_confianca_ok" name="nivel_confianca_ok"><label for="nivel_confianca_ok"></label></div></td>
+                    <td><input type="text" id="nivel_confianca_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Compatibilidade com Limite da Aplicação</strong></td>
+                    <td><input type="text" id="compatibilidade_val" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="compatibilidade_ok" name="compatibilidade_ok"><label for="compatibilidade_ok"></label></div></td>
+                    <td><input type="text" id="compatibilidade_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-chart-line"></i> 8. RESULTADOS DA CALIBRAÇÃO E FAIXA OPERACIONAL</h2>
+        <table id="resultados_table">
+            <thead>
+                <tr>
+                    <th>Ponto</th>
+                    <th>Valor Ref. <br>[Unid.]</th>
+                    <th>Valor Medido <br>[Unid.]</th>
+                    <th>Erro <br>[Unid.]</th>
+                    <th>Incerteza <br>[Unid.]</th>
+                    <th>Limite de Erro Permitido <br>[Unid.]</th>
+                    <th>OK?</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="ponto_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="valor_ref_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="valor_medido_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="erro_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="incerteza_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="limite_erro_res_0" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="ok_res_0" name="ok_res_0_checkbox"><label for="ok_res_0"></label></div></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addResultadoRow()"><i class="fas fa-plus-circle"></i> Adicionar Ponto</button>
+
+        <div class="form-group">
+            <label for="faixa_calibracao_reportada"><strong>Faixa de Calibração Reportada:</strong></label>
+            <input type="text" id="faixa_calibracao_reportada" placeholder="[Valor] a [Valor] [Unidade]">
+        </div>
+        <div class="form-group">
+            <label for="faixa_operacional_instrumento"><strong>Faixa Operacional do Instrumento:</strong></label>
+            <input type="text" id="faixa_operacional_instrumento" placeholder="[Valor] a [Valor] [Unidade] ou [Não especificada]">
+        </div>
+        <div class="form-group">
+            <label for="comentarios_resultados"><strong>Comentários sobre os Resultados:</strong></label>
+            <textarea id="comentarios_resultados"></textarea>
+        </div>
+
+        <h2><i class="fas fa-wrench"></i> 9. ANÁLISE DE AJUSTE / REPARO</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Status / Descrição</th>
+                    <th>Observações / Ações Retroativas (se aplicável)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Resultados <em>as found</em></strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="as_found" value="Presentes" checked><label>Presentes</label></div>
+                            <div class="custom-radio"><input type="radio" name="as_found" value="Ausentes"><label>Ausentes</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_as_found" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Resultados <em>as left</em></strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="as_left" value="Presentes" checked><label>Presentes</label></div>
+                            <div class="custom-radio"><input type="radio" name="as_left" value="Ausentes"><label>Ausentes</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_as_left" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Ajustes Executados</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="ajustes_executados" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="ajustes_executados" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_ajustes_executados" placeholder="Se sim, descrever quais ajustes e o impacto. Ex: Ajuste de Span em 0.5%" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Ações Retroativas</strong></td>
+                    <td colspan="2"><textarea id="acoes_retroativas" placeholder="Descrever a necessidade de ações retroativas ou recalculo de medições anteriores se os resultados 'as found' indicarem."></textarea></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-check-circle"></i> 10. DECLARAÇÃO DE CONFORMIDADE E REGRAS DE DECISÃO</h2>
+        <p>Essencial para a tomada de decisão sobre a aptidão para uso.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Critério</th>
+                    <th>Status</th>
+                    <th>Evidência / Comentários</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Declaração de Conformidade Presente</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="declaracao_presente" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="declaracao_presente" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="evidencia_declaracao_presente" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Especificação / Limite Explicitado</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="especificacao_limite" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="especificacao_limite" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="evidencia_especificacao_limite" placeholder="A norma ou limite de tolerância utilizado para a conformidade está claramente citado? Ex: [Norma/Limite]." style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Regra de Decisão Documentada</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="regra_decisao" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="regra_decisao" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="evidencia_regra_decisao" placeholder="A regra de decisão (ex: aceitação sem risco, com risco específico) está clara no certificado? Ex: [Regra de Decisão]." style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Nível de Risco Declarado</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="nivel_risco" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="nivel_risco" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="evidencia_nivel_risco" placeholder="O risco associado à decisão de conformidade (ex: risco do consumidor/produtor) é especificado?" style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-globe-americas"></i> 11. CONDIÇÕES AMBIENTAIS DA CALIBRAÇÃO PÓS-CALIBRAÇÃO / USO</h2>
+        <p>Esta seção é crucial quando a calibração é realizada em condições diferentes do uso final do instrumento.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Valor no Uso</th>
+                    <th>Limite Aceitável (se houver)</th>
+                    <th>OK?</th>
+                    <th>Observações / Impacto no Uso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Temperatura (°C)</strong></td>
+                    <td><input type="text" id="temp_uso_val" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="temp_uso_limite" placeholder="Ex: 25 ± 5 °C" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="temp_uso_ok" name="temp_uso_ok"><label for="temp_uso_ok"></label></div></td>
+                    <td><input type="text" id="temp_uso_obs" placeholder="Avaliar a diferença entre condição de calibração e uso." style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Umidade Relativa (%)</strong></td>
+                    <td><input type="text" id="umidade_uso_val" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="umidade_uso_limite" placeholder="Ex: 60 ± 15 %" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="umidade_uso_ok" name="umidade_uso_ok"><label for="umidade_uso_ok"></label></div></td>
+                    <td><input type="text" id="umidade_uso_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Pressão Atmosférica (kPa)</strong></td>
+                    <td><input type="text" id="pressao_uso_val" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="pressao_uso_limite" placeholder="Ex: 100 ± 10 kPa" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="pressao_uso_ok" name="pressao_uso_ok"><label for="pressao_uso_ok"></label></div></td>
+                    <td><input type="text" id="pressao_uso_obs" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Fluido de Operação</strong></td>
+                    <td><input type="text" id="fluido_uso_val" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="fluido_uso_limite" placeholder="Ex: Água / Ar Seco" style="width: calc(100% - 20px);"></td>
+                    <td><div class="custom-checkbox"><input type="checkbox" id="fluido_uso_ok" name="fluido_uso_ok"><label for="fluido_uso_ok"></label></div></td>
+                    <td><input type="text" id="fluido_uso_obs" placeholder="Adequado para a aplicação do instrumento?" style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-calendar-alt"></i> 12. PERIODICIDADE DA CALIBRAÇÃO</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Histórico</th>
+                    <th>Data/Valor</th>
+                    <th>Atende Periodicidade?</th>
+                    <th>Justificativa / Comentário (foco na otimização)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Data Última Calibração</strong></td>
+                    <td><input type="date" id="data_ultima_calibracao" style="width: calc(100% - 20px);"></td>
+                    <td></td>
+                    <td><input type="text" id="obs_data_ultima_calibracao" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Intervalo Realizado</strong></td>
+                    <td><input type="text" id="intervalo_realizado" placeholder="_____ meses" style="width: calc(100% - 20px);"></td>
+                    <td></td>
+                    <td><input type="text" id="obs_intervalo_realizado" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Periodicidade Definida</strong></td>
+                    <td><input type="text" id="periodicidade_definida" placeholder="_____ meses" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="periodicidade_atende" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="periodicidade_atende" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_periodicidade_definida" placeholder="Análise de tendência ou impacto na periodicidade." style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-search-plus"></i> 13. AVALIAÇÕES ESPECÍFICAS POR TIPO DE INSTRUMENTO</h2>
+        <p>Esta seção é onde o analista pode adicionar sua expertise para o tipo de instrumento.</p>
+        <h3>MEDIDORES DE PRESSÃO</h3>
+        <table id="pressao_table">
+            <thead>
+                <tr>
+                    <th>Critério</th>
+                    <th>Status</th>
+                    <th>Observações / Justificativa Técnica (Ex: Resultados, Limites)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="pressao_criterio_nome_0" placeholder="Nome do Critério" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_0" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_0" value="Nao"><label>Não</label></div>
+                            <div class="custom-radio"><input type="radio" name="pressao_criterio_status_0" value="N/A"><label>N/A</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_pressao_criterio_0" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addPressaoCriterio()"><i class="fas fa-plus-circle"></i> Adicionar Critério Pressão</button>
+
+        <h3>MEDIDORES DE VAZÃO (conforme Portaria INMETRO 291/2021)</h3>
+        <table id="vazao_table">
+            <thead>
+                <tr>
+                    <th>Critério</th>
+                    <th>Status</th>
+                    <th>Observações / Justificativa Técnica (Ex: Resultados, Limites)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="vazao_criterio_nome_0" placeholder="Nome do Critério" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_0" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_0" value="Nao"><label>Não</label></div>
+                            <div class="custom-radio"><input type="radio" name="vazao_criterio_status_0" value="N/A"><label>N/A</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" name="obs_vazao_criterio_0" style="width: calc(100% - 20px);"></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addVazaoCriterio()"><i class="fas fa-plus-circle"></i> Adicionar Critério Vazão</button>
+
+
+        <h2><i class="fas fa-exclamation-triangle"></i> 14. NÃO CONFORMIDADES E AÇÕES PROPOSTAS</h2>
+        <p>Esta seção é crucial para um plano de ação. Ser claro e objetivo.</p>
+        <table id="nao_conformidades_table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Descrição da Não Conformidade / Desvio</th>
+                    <th>Criticidade</th>
+                    <th>Ação Proposta / Responsável / Prazo Sugerido</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="number" name="nc_item_0" value="1" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" name="nc_descricao_0" style="width: calc(100% - 20px);"></td>
+                    <td>
+                        <select name="nc_criticidade_0" style="width: calc(100% - 20px);">
+                            <option value="Alta">Alta</option>
+                            <option value="Media" selected>Média</option>
+                            <option value="Baixa">Baixa</option>
+                        </select>
+                    </td>
+                    <td><textarea name="nc_acao_0" style="width: calc(100% - 20px); min-height: 40px;"></textarea></td>
+                    <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" onclick="addNaoConformidadeRow()"><i class="fas fa-plus-circle"></i> Adicionar Não Conformidade</button>
+
+        <div class="form-group" style="margin-top: 30px;">
+            <label for="recomendacoes_adicionais"><strong>Recomendações Adicionais:</strong></label>
+            <textarea id="recomendacoes_adicionais" placeholder="1. Recomendação 1&#10;2. Recomendação 2"></textarea>
+        </div>
+
+        <h2><i class="fas fa-clipboard-check"></i> 15. APTIDÃO PARA USO E CONCLUSÃO FINAL</h2>
+        <p>Esta seção consolida a avaliação e a decisão.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Critério</th>
+                    <th>Avaliação</th>
+                    <th>Observações / Justificativa Concisa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Erro dentro dos limites</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="erro_limites" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="erro_limites" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_erro_limites" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Incerteza Adequada</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="incerteza_adequada" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="incerteza_adequada" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_incerteza_adequada" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td><strong>Requisitos RTM Atendidos</strong></td>
+                    <td>
+                        <div class="status-choice">
+                            <div class="custom-radio"><input type="radio" name="requisitos_rtm" value="Sim" checked><label>Sim</label></div>
+                            <div class="custom-radio"><input type="radio" name="requisitos_rtm" value="Nao"><label>Não</label></div>
+                        </div>
+                    </td>
+                    <td><input type="text" id="obs_requisitos_rtm" style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Status Final:</strong></p>
+        <div class="status-choice">
+            <div class="custom-radio"><input type="radio" name="status_final" value="APROVADO" checked><label>APROVADO</label></div>
+            <div class="custom-radio"><input type="radio" name="status_final" value="APROVADO COM RESSALVAS"><label>APROVADO COM RESSALVAS</label></div>
+            <div class="custom-radio"><input type="radio" name="status_final" value="REJEITADO"><label>REJEITADO</label></div>
+        </div>
+        <div class="form-group" style="margin-top: 20px;">
+            <label for="justificativa_conclusao"><strong>Justificativa da Conclusão:</strong></label>
+            <textarea id="justificativa_conclusao"></textarea>
+        </div>
+
+        <h2><i class="fas fa-signature"></i> 16. ASSINATURAS</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Função</th>
+                    <th>Nome</th>
+                    <th>Data</th>
+                    <th>Assinatura</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Analista</td>
+                    <td><input type="text" id="assinatura_analista_nome" style="width: calc(100% - 20px);"></td>
+                    <td><input type="date" id="assinatura_analista_data" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="assinatura_analista_assinatura" disabled placeholder="Assinatura Digital (se houver)" style="width: calc(100% - 20px);"></td>
+                </tr>
+                <tr>
+                    <td>Aprovador</td>
+                    <td><input type="text" id="assinatura_aprovador_nome" style="width: calc(100% - 20px);"></td>
+                    <td><input type="date" id="assinatura_aprovador_data" style="width: calc(100% - 20px);"></td>
+                    <td><input type="text" id="assinatura_aprovador_assinatura" disabled placeholder="Assinatura Digital (se houver)" style="width: calc(100% - 20px);"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-paperclip"></i> 17. ANEXOS E REFERÊNCIAS</h2>
+        <div class="checklist">
+            <ul>
+                <li><div class="custom-checkbox"><input type="checkbox" id="anexo_certificado_pdf" name="anexo_certificado_pdf"><label for="anexo_certificado_pdf">Cópia do Certificado de Calibração Original (PDF)</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="anexo_certificados_padroes" name="anexo_certificados_padroes"><label for="anexo_certificados_padroes">Cópia(s) do(s) Certificado(s) dos Padrões (se não rastreáveis diretamente no certificado principal)</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="anexo_historico_calibracoes" name="anexo_historico_calibracoes"><label for="anexo_historico_calibracoes">Histórico de Calibrações Anteriores do Instrumento</label></div></li>
+                <li><div class="custom-checkbox"><input type="checkbox" id="anexo_requisitos_internos" name="anexo_requisitos_internos"><label for="anexo_requisitos_internos">[Documento de Requisitos Internos/Norma Aplicável para Tolerância/Uso]</label></div></li>
+                <li>Outros: <input type="text" id="anexo_outros" placeholder="Especificar outros documentos relevantes" style="width: calc(100% - 20px);"></li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="generatePdf()"><i class="fas fa-file-pdf"></i> Gerar PDF</button>
+            <button class="btn btn-secondary" onclick="saveXml()"><i class="fas fa-file-code"></i> Salvar como XML</button>
+            <button class="btn btn-secondary" onclick="saveJson()"><i class="fas fa-file-code"></i> Salvar como JSON</button>
+        </div>
+
+        <div class="footer-info">
+            <p>Registro de Análise Crítica - Desenvolvido para otimização de processos metrológicos.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Set the current date for the analysis date field on page load
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('data_analise').value = `${year}-${month}-${day}`;
+        });
+
+        // Global counters for dynamic row IDs to ensure uniqueness
+        let padraoRowCounter = 0;
+        let resultadoRowCounter = 0;
+        let pressaoCritCounter = 0;
+        let vazaoCritCounter = 0;
+        let ncRowCounter = 0;
+
+        // Function to add a new row in the Padrões table
+        function addPadraoRow() {
+            padraoRowCounter++;
+            const table = document.getElementById('padroes_table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td><input type="text" name="padrao_utilizado_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="cert_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="lab_calibrador_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="num_acreditacao_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="incerteza_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="date" name="validade_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td>
+                    <div class="status-choice">
+                        <div class="custom-radio"><input type="radio" name="status_padrao_${padraoRowCounter}" value="OK" checked><label>OK</label></div>
+                        <div class="custom-radio"><input type="radio" name="status_padrao_${padraoRowCounter}" value="NOK"><label>NOK</label></div>
+                    </div>
+                </td>
+                <td><input type="text" name="obs_padrao_${padraoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+        }
+
+        // Function to add a new row in the Resultados table
+        function addResultadoRow() {
+            resultadoRowCounter++;
+            const table = document.getElementById('resultados_table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            // Note: Updated name attributes for checkboxes to avoid conflict with initial 0 counter
+            newRow.innerHTML = `
+                <td><input type="text" name="ponto_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="valor_ref_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="valor_medido_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="erro_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="incerteza_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="limite_erro_res_${resultadoRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td><div class="custom-checkbox"><input type="checkbox" id="ok_res_${resultadoRowCounter}" name="ok_res_${resultadoRowCounter}_checkbox"><label for="ok_res_${resultadoRowCounter}"></label></div></td>
+                <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+        }
+
+        // Function to add a new criterion row for Pressure
+        function addPressaoCriterio() {
+            pressaoCritCounter++;
+            const table = document.getElementById('pressao_table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" name="pressao_criterio_nome_${pressaoCritCounter}" placeholder="Nome do Critério" style="width: calc(100% - 20px);"></td>
+                <td>
+                    <div class="status-choice">
+                        <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${pressaoCritCounter}" value="Sim" checked><label>Sim</label></div>
+                        <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${pressaoCritCounter}" value="Nao"><label>Não</label></div>
+                        <div class="custom-radio"><input type="radio" name="pressao_criterio_status_${pressaoCritCounter}" value="N/A"><label>N/A</label></div>
+                    </div>
+                </td>
+                <td><input type="text" name="obs_pressao_criterio_${pressaoCritCounter}" style="width: calc(100% - 20px);"></td>
+                <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+        }
+
+        // Function to add a new criterion row for Vazão
+        function addVazaoCriterio() {
+            vazaoCritCounter++;
+            const table = document.getElementById('vazao_table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" name="vazao_criterio_nome_${vazaoCritCounter}" placeholder="Nome do Critério" style="width: calc(100% - 20px);"></td>
+                <td>
+                    <div class="status-choice">
+                        <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${vazaoCritCounter}" value="Sim" checked><label>Sim</label></div>
+                        <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${vazaoCritCounter}" value="Nao"><label>Não</label></div>
+                        <div class="custom-radio"><input type="radio" name="vazao_criterio_status_${vazaoCritCounter}" value="N/A"><label>N/A</label></div>
+                    </div>
+                </td>
+                <td><input type="text" name="obs_vazao_criterio_${vazaoCritCounter}" style="width: calc(100% - 20px);"></td>
+                <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+        }
+
+        // Function to add a new row in the Não Conformidades table
+        function addNaoConformidadeRow() {
+            ncRowCounter++;
+            const table = document.getElementById('nao_conformidades_table').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td><input type="number" name="nc_item_${ncRowCounter}" value="${ncRowCounter + 1}" style="width: calc(100% - 20px);"></td>
+                <td><input type="text" name="nc_descricao_${ncRowCounter}" style="width: calc(100% - 20px);"></td>
+                <td>
+                    <select name="nc_criticidade_${ncRowCounter}" style="width: calc(100% - 20px);">
+                        <option value="Alta">Alta</option>
+                        <option value="Media" selected>Média</option>
+                        <option value="Baixa">Baixa</option>
+                    </select>
+                </td>
+                <td><textarea name="nc_acao_${ncRowCounter}" style="width: calc(100% - 20px); min-height: 40px;"></textarea></td>
+                <td><button type="button" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+        }
+
+        // Generic function to remove a table row
+        function removeRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        // Function to collect all form data into a JavaScript object
+        function collectFormData() {
+            const data = {};
+
+            // Header and general info
+            data.documento = "RAC-001";
+            data.versao = "2.1";
+            data.data_analise = document.getElementById('data_analise').value;
+            data.analisado_por = document.getElementById('analisado_por').value;
+            data.aprovado_por = document.getElementById('aprovado_por').value;
+            data.proposito = document.querySelector('.purpose p').innerText;
+
+            // Section 1: Certificado e Laboratório
+            data.identificacao_certificado_laboratorio = {
+                numero_certificado: document.getElementById('num_certificado_id').value,
+                laboratorio_emissor: document.getElementById('lab_emissor_id').value,
+                data_emissao: document.getElementById('data_emissao_id').value,
+                data_calibracao: document.getElementById('data_calibracao_id').value,
+                validade_calibracao: {
+                    valor: document.getElementById('validade_calibracao_id').value,
+                    status: document.querySelector('input[name="status_validade_calibracao"]:checked').value,
+                    observacoes: document.getElementById('obs_validade_calibracao').value
+                },
+                responsavel_tecnico: {
+                    nome: document.getElementById('responsavel_tecnico_id').value,
+                    status: document.querySelector('input[name="status_responsavel_tecnico"]:checked').value,
+                    observacoes: document.getElementById('obs_responsavel_tecnico').value
+                }
+            };
+
+            // Section 2: Acreditação e Escopo do Laboratório
+            data.acreditacao_escopo = {
+                laboratorio_acreditado_cgcre_inmetro: {
+                    status: document.querySelector('input[name="lab_acreditado"]:checked').value,
+                    observacoes: document.getElementById('obs_lab_acreditado').value
+                },
+                escopo_acreditacao_adequado: {
+                    status: document.querySelector('input[name="escopo_adequado"]:checked').value,
+                    observacoes: document.getElementById('obs_escopo_adequado').value
+                },
+                simbolo_acreditacao_presente: {
+                    status: document.querySelector('input[name="simbolo_presente"]:checked').value,
+                    observacoes: document.getElementById('obs_simbolo_presente').value
+                }
+            };
+
+            // Section 3: Identificação do Instrumento
+            data.identificacao_instrumento = {
+                tipo_equipamento: document.getElementById('tipo_equipamento').value,
+                fabricante_modelo: document.getElementById('fabricante_modelo').value,
+                numero_serie: document.getElementById('numero_serie').value,
+                tag_id_interno: document.getElementById('tag_id_interno').value,
+                aplicacao: document.getElementById('aplicacao').value,
+                localizacao: document.getElementById('localizacao').value
+            };
+
+            // Section 4: Condições Ambientais e Método da Calibração
+            data.condicoes_ambientais_metodo_calibracao = {
+                temperatura: {
+                    valor_reportado: document.getElementById('temp_reportada').value,
+                    limite_aceitavel: document.getElementById('temp_limite').value,
+                    ok: document.getElementById('temp_ok').checked,
+                    observacoes_impacto: document.getElementById('temp_obs').value
+                },
+                umidade_relativa: {
+                    valor_reportado: document.getElementById('umidade_reportada').value,
+                    limite_aceitavel: document.getElementById('umidade_limite').value,
+                    ok: document.getElementById('umidade_ok').checked,
+                    observacoes_impacto: document.getElementById('umidade_obs').value
+                },
+                pressao_atmosferica: {
+                    valor_reportado: document.getElementById('pressao_reportada').value,
+                    limite_aceitavel: document.getElementById('pressao_limite').value,
+                    ok: document.getElementById('pressao_ok').checked,
+                    observacoes_impacto: document.getElementById('pressao_obs').value
+                },
+                fluido_calibracao: {
+                    valor_reportado: document.getElementById('fluido_cal_reportado').value,
+                    limite_aceitavel: document.getElementById('fluido_cal_limite').value,
+                    ok: document.getElementById('fluido_cal_ok').checked,
+                    observacoes_impacto: document.getElementById('fluido_cal_obs').value
+                },
+                local_calibracao: {
+                    tipo: document.querySelector('input[name="local_calibracao"]:checked').value,
+                    ok: document.getElementById('local_cal_ok').checked,
+                    observacoes: document.getElementById('local_cal_obs').value
+                },
+                metodo_utilizado: {
+                    nome_codigo: document.getElementById('metodo_utilizado_val').value,
+                    ok: document.getElementById('metodo_utilizado_ok').checked,
+                    observacoes: document.getElementById('metodo_utilizado_obs').value
+                }
+            };
+
+            // Section 5: Elementos Essenciais ISO/IEC 17025 (Checklist)
+            data.elementos_essenciais_iso_iec_17025 = {
+                identificacao_inequivoca_item: document.getElementById('req1').checked,
+                identificacao_laboratorio: document.getElementById('req2').checked,
+                data_calibracao: document.getElementById('req3').checked,
+                metodo_utilizado: document.getElementById('req4').checked,
+                resultados_unidades_apropriadas: document.getElementById('req5').checked,
+                incerteza_medicao_declarada: document.getElementById('req6').checked,
+                rastreabilidade_evidenciada: document.getElementById('req7').checked,
+                condicoes_ambientais_informadas: document.getElementById('req8').checked,
+                declaracao_nao_reproducao_parcial: document.getElementById('req9').checked,
+                assinatura_responsavel_autorizado: document.getElementById('req10').checked
+            };
+
+            // Section 6: Rastreabilidade Metrológica e Incerteza dos Padrões
+            data.rastreabilidade_metrologica_incerteza_padroes = [];
+            document.querySelectorAll('#padroes_table tbody tr').forEach((row, index) => {
+                const inputs = row.querySelectorAll(`input[name^="padrao_utilizado_${index}"], input[name^="cert_padrao_${index}"], input[name^="lab_calibrador_padrao_${index}"], input[name^="num_acreditacao_padrao_${index}"], input[name^="incerteza_padrao_${index}"], input[name^="validade_padrao_${index}"], input[name^="obs_padrao_${index}"]`);
+                const radioStatus = row.querySelector(`input[name="status_padrao_${index}"]:checked`);
+                data.rastreabilidade_metrologica_incerteza_padroes.push({
+                    padrao_utilizado: inputs[0] ? inputs[0].value : '',
+                    certificado_padrao: inputs[1] ? inputs[1].value : '',
+                    laboratorio_calibrador_padrao: inputs[2] ? inputs[2].value : '',
+                    acreditacao: inputs[3] ? inputs[3].value : '',
+                    incerteza_padrao_k2: inputs[4] ? inputs[4].value : '',
+                    validade_padrao: inputs[5] ? inputs[5].value : '',
+                    status: radioStatus ? radioStatus.value : '',
+                    observacoes_justificativa: inputs[6] ? inputs[6].value : ''
+                });
+            });
+
+            // Section 7: Avaliação da Incerteza de Medição do Certificado
+            data.avaliacao_incerteza_medicao_certificado = {
+                incerteza_expandida_declarada: {
+                    valor_evidencia: document.getElementById('incerteza_declarada_val').value,
+                    ok: document.getElementById('incerteza_declarada_ok').checked,
+                    comentarios_justificativa: document.getElementById('incerteza_declarada_obs').value
+                },
+                metodo_calculo_gum_nit_dicla_021: {
+                    status: document.getElementById('metodo_calculo_val').value,
+                    ok: document.getElementById('metodo_calculo_ok').checked,
+                    comentarios_justificativa: document.getElementById('metodo_calculo_obs').value
+                },
+                todas_contribuicoes_relevantes_consideradas: {
+                    status: document.getElementById('contribuicoes_val').value,
+                    ok: document.getElementById('contribuicoes_ok').checked,
+                    comentarios_justificativa: document.getElementById('contribuicoes_obs').value
+                },
+                nivel_confianca_95: {
+                    valor_evidencia: document.getElementById('nivel_confianca_val').value,
+                    ok: document.getElementById('nivel_confianca_ok').checked,
+                    comentarios_justificativa: document.getElementById('nivel_confianca_obs').value
+                },
+                compatibilidade_limite_aplicacao: {
+                    status: document.getElementById('compatibilidade_val').value,
+                    ok: document.getElementById('compatibilidade_ok').checked,
+                    comentarios_justificativa: document.getElementById('compatibilidade_obs').value
+                }
+            };
+
+            // Section 8: Resultados da Calibração e Faixa Operacional
+            data.resultados_calibracao_faixa_operacional = {
+                pontos_calibracao: [],
+                faixa_calibracao_reportada: document.getElementById('faixa_calibracao_reportada').value,
+                faixa_operacional_instrumento: document.getElementById('faixa_operacional_instrumento').value,
+                comentarios_resultados: document.getElementById('comentarios_resultados').value
+            };
+            document.querySelectorAll('#resultados_table tbody tr').forEach((row, index) => {
+                const inputs = row.querySelectorAll(`input[name^="ponto_res_${index}"], input[name^="valor_ref_res_${index}"], input[name^="valor_medido_res_${index}"], input[name^="erro_res_${index}"], input[name^="incerteza_res_${index}"], input[name^="limite_erro_res_${index}"]`);
+                data.resultados_calibracao_faixa_operacional.pontos_calibracao.push({
+                    ponto: inputs[0] ? inputs[0].value : '',
+                    valor_ref: inputs[1] ? inputs[1].value : '',
+                    valor_medido: inputs[2] ? inputs[2].value : '',
+                    erro: inputs[3] ? inputs[3].value : '',
+                    incerteza: inputs[4] ? inputs[4].value : '',
+                    limite_erro_permitido: inputs[5] ? inputs[5].value : '',
+                    ok: row.querySelector(`input[name="ok_res_${index}_checkbox"]`) ? row.querySelector(`input[name="ok_res_${index}_checkbox"]`).checked : false
+                });
+            });
+
+            // Section 9: Análise de Ajuste / Reparo
+            data.analise_ajuste_reparo = {
+                resultados_as_found: { presentes: document.querySelector('input[name="as_found"]:checked').value },
+                resultados_as_left: { presentes: document.querySelector('input[name="as_left"]:checked').value },
+                ajustes_executados: {
+                    status: document.querySelector('input[name="ajustes_executados"]:checked').value,
+                    observacoes: document.getElementById('obs_ajustes_executados').value
+                },
+                acoes_retroativas: document.getElementById('acoes_retroativas').value
+            };
+
+            // Section 10: Declaração de Conformidade e Regras de Decisão
+            data.declaracao_conformidade_regras_decisao = {
+                declaracao_presente: {
+                    status: document.querySelector('input[name="declaracao_presente"]:checked').value,
+                    evidencia_comentarios: document.getElementById('evidencia_declaracao_presente').value
+                },
+                especificacao_limite_explicitado: {
+                    status: document.querySelector('input[name="especificacao_limite"]:checked').value,
+                    evidencia_comentarios: document.getElementById('evidencia_especificacao_limite').value
+                },
+                regra_decisao_documentada: {
+                    status: document.querySelector('input[name="regra_decisao"]:checked').value,
+                    evidencia_comentarios: document.getElementById('evidencia_regra_decisao').value
+                },
+                nivel_risco_declarado: {
+                    status: document.querySelector('input[name="nivel_risco"]:checked').value,
+                    evidencia_comentarios: document.getElementById('evidencia_nivel_risco').value
+                }
+            };
+
+            // Section 11: Condições Ambientais da Calibração Pós-Calibração / Uso
+            data.condicoes_ambientais_pos_calibracao_uso = {
+                temperatura: {
+                    valor: document.getElementById('temp_uso_val').value,
+                    limite_aceitavel: document.getElementById('temp_uso_limite').value,
+                    ok: document.getElementById('temp_uso_ok').checked,
+                    observacoes_impacto: document.getElementById('temp_uso_obs').value
+                },
+                umidade_relativa: {
+                    valor: document.getElementById('umidade_uso_val').value,
+                    limite_aceitavel: document.getElementById('umidade_uso_limite').value,
+                    ok: document.getElementById('umidade_uso_ok').checked,
+                    observacoes_impacto: document.getElementById('umidade_uso_obs').value
+                },
+                pressao_atmosferica: {
+                    valor: document.getElementById('pressao_uso_val').value,
+                    limite_aceitavel: document.getElementById('pressao_uso_limite').value,
+                    ok: document.getElementById('pressao_uso_ok').checked,
+                    observacoes_impacto: document.getElementById('pressao_uso_obs').value
+                },
+                fluido_operacao: {
+                    valor: document.getElementById('fluido_uso_val').value,
+                    limite_aceitavel: document.getElementById('fluido_uso_limite').value,
+                    ok: document.getElementById('fluido_uso_ok').checked,
+                    observacoes_impacto: document.getElementById('fluido_uso_obs').value
+                }
+            };
+
+            // Section 12: Periodicidade da Calibração
+            data.periodicidade_calibracao = {
+                data_ultima_calibracao: document.getElementById('data_ultima_calibracao').value,
+                intervalo_realizado_meses: document.getElementById('intervalo_realizado').value,
+                periodicidade_definida_meses: document.getElementById('periodicidade_definida').value,
+                atende_periodicidade: document.querySelector('input[name="periodicidade_atende"]:checked').value,
+                comentarios_otimizacao: document.getElementById('obs_periodicidade_definida').value
+            };
+
+            // Section 13: Avaliações Específicas por Tipo de Instrumento
+            data.avaliacoes_especificas_tipo_instrumento = {
+                medidores_pressao: [],
+                medidores_vazao: []
+            };
+            document.querySelectorAll('#pressao_table tbody tr').forEach((row, index) => {
+                const inputs = row.querySelectorAll(`input[name^="pressao_criterio_nome_${index}"], input[name^="obs_pressao_criterio_${index}"]`);
+                const radioStatus = row.querySelector(`input[name="pressao_criterio_status_${index}"]:checked`);
+                data.avaliacoes_especificas_tipo_instrumento.medidores_pressao.push({
+                    criterio: {
+                        nome: inputs[0] ? inputs[0].value : '',
+                        status: radioStatus ? radioStatus.value : '',
+                        observacoes_justificativa: inputs[1] ? inputs[1].value : ''
+                    }
+                });
+            });
+            document.querySelectorAll('#vazao_table tbody tr').forEach((row, index) => {
+                const inputs = row.querySelectorAll(`input[name^="vazao_criterio_nome_${index}"], input[name^="obs_vazao_criterio_${index}"]`);
+                const radioStatus = row.querySelector(`input[name="vazao_criterio_status_${index}"]:checked`);
+                data.avaliacoes_especificas_tipo_instrumento.medidores_vazao.push({
+                    criterio: {
+                        nome: inputs[0] ? inputs[0].value : '',
+                        status: radioStatus ? radioStatus.value : '',
+                        observacoes_justificativa: inputs[1] ? inputs[1].value : ''
+                    }
+                });
+            });
+
+            // Section 14: Não Conformidades e Ações Propostas
+            data.nao_conformidades_acoes_propostas = [];
+            document.querySelectorAll('#nao_conformidades_table tbody tr').forEach((row, index) => {
+                const inputs = row.querySelectorAll(`input[name^="nc_item_${index}"], input[name^="nc_descricao_${index}"], textarea[name^="nc_acao_${index}"]`);
+                const selectCriticidade = row.querySelector(`select[name^="nc_criticidade_${index}"]`);
+
+                data.nao_conformidades_acoes_propostas.push({
+                    item: inputs[0] ? inputs[0].value : '',
+                    descricao: inputs[1] ? inputs[1].value : '',
+                    criticidade: selectCriticidade ? selectCriticidade.value : '',
+                    acao_proposta: inputs[2] ? inputs[2].value : ''
+                });
+            });
+            data.recomendacoes_adicionais = document.getElementById('recomendacoes_adicionais').value.split('\n').filter(line => line.trim() !== '');
+
+            // Section 15: Aptidão para Uso e Conclusão Final
+            data.aptidao_uso_conclusao_final = {
+                erro_dentro_limites: {
+                    avaliacao: document.querySelector('input[name="erro_limites"]:checked').value,
+                    observacoes: document.getElementById('obs_erro_limites').value
+                },
+                incerteza_adequada: {
+                    avaliacao: document.querySelector('input[name="incerteza_adequada"]:checked').value,
+                    observacoes: document.getElementById('obs_incerteza_adequada').value
+                },
+                requisitos_rtm_atendidos: {
+                    avaliacao: document.querySelector('input[name="requisitos_rtm"]:checked').value,
+                    observacoes: document.getElementById('obs_requisitos_rtm').value
+                },
+                status_final: document.querySelector('input[name="status_final"]:checked').value,
+                justificativa_conclusao: document.getElementById('justificativa_conclusao').value
+            };
+
+            // Section 16: Assinaturas
+            data.assinaturas = {
+                analista: {
+                    nome: document.getElementById('assinatura_analista_nome').value,
+                    data: document.getElementById('assinatura_analista_data').value
+                },
+                aprovador: {
+                    nome: document.getElementById('assinatura_aprovador_nome').value,
+                    data: document.getElementById('assinatura_aprovador_data').value
+                }
+            };
+
+            // Section 17: Anexos e Referências
+            data.anexos_referencias = {
+                copia_certificado_pdf: document.getElementById('anexo_certificado_pdf').checked,
+                copia_certificados_padroes: document.getElementById('anexo_certificados_padroes').checked,
+                historico_calibracoes: document.getElementById('anexo_historico_calibracoes').checked,
+                documento_requisitos_internos: document.getElementById('anexo_requisitos_internos').checked,
+                outros: document.getElementById('anexo_outros').value
+            };
+
+            return data;
+        }
+
+        // Function to generate PDF
+        // NOTE: This uses html2canvas to capture the page as an image, and jsPDF to put that image into a PDF.
+        // Complex CSS, long pages, or interactive elements might not render perfectly.
+        // For production, consider server-side rendering or dedicated PDF generation APIs.
+        function generatePdf() {
+            const element = document.querySelector(".app-container");
+            const filename = 'registro_analise.pdf';
+
+            html2canvas(element, { scale: 2, logging: false }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' size (210x297mm)
+
+                const imgWidth = 200; // Width of the image in PDF (mm)
+                const pageHeight = 290; // Height of A4 page in PDF (mm)
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 5; // Initial Y position with some margin
+
+                pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= -100) { // Add new pages until content is fully rendered, with a small buffer
+                    position = heightLeft - imgHeight + 5; // Adjust position for next page
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save(filename);
+                alert(`PDF "${filename}" gerado com sucesso!`);
+            }).catch(error => {
+                console.error("Erro ao gerar PDF:", error);
+                alert('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
+            });
+        }
+
+
+        // Function to save data as XML
+        function saveXml() {
+            const data = collectFormData();
+            const xml = jsonToXml(data, 'RegistroAnaliseCritica'); // Convert JS object to XML string
+            const blob = new Blob([xml], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'registro_analise.xml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('Dados salvos como registro_analise.xml');
+        }
+
+        // Function to save data as JSON
+        function saveJson() {
+            const data = collectFormData();
+            const json = JSON.stringify(data, null, 2); // Convert JS object to formatted JSON string
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'registro_analise.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('Dados salvos como registro_analise.json');
+        }
+
+        // Helper function to convert JSON object to XML string
+        // This function attempts to sanitize keys to be valid XML tag names
+        // and handles nested objects and arrays.
+        function jsonToXml(obj, rootName = 'data') {
+            let xml = '';
+
+            function escapeXml(text) {
+                return String(text).replace(/&/g, '&amp;')
+                                   .replace(/</g, '&lt;')
+                                   .replace(/>/g, '&gt;')
+                                   .replace(/"/g, '&quot;')
+                                   .replace(/'/g, '&apos;');
+            }
+
+            function sanitizeTagName(name) {
+                // Remove invalid characters, replace spaces/hyphens with underscore, ensure valid start
+                let cleanName = name.replace(/[^a-zA-Z0-9_]/g, '_');
+                if (!isNaN(parseInt(cleanName.charAt(0)))) {
+                    cleanName = '_' + cleanName; // XML tag names cannot start with a number
+                }
+                if (cleanName.startsWith('_')) {
+                    cleanName = cleanName.substring(1); // Remove leading underscore if not necessary after number fix
+                }
+                if (!cleanName) cleanName = 'item'; // Fallback if name becomes empty
+
+                // Simple singularization for common cases
+                if (cleanName.endsWith('oes') && cleanName.length > 3) { // acoes -> acao, observacoes -> observacao
+                    cleanName = cleanName.slice(0, -3) + 'ao';
+                } else if (cleanName.endsWith('s') && cleanName.length > 1) {
+                    cleanName = cleanName.slice(0, -1);
+                }
+                return cleanName;
+            }
+
+            function buildXml(currentObj, tagName) {
+                let currentXml = `<${tagName}>`;
+                if (typeof currentObj === 'object' && currentObj !== null) {
+                    for (const key in currentObj) {
+                        if (currentObj.hasOwnProperty(key)) {
+                            const newTagName = sanitizeTagName(key);
+                            if (Array.isArray(currentObj[key])) {
+                                currentObj[key].forEach(item => {
+                                    currentXml += buildXml(item, newTagName);
+                                });
+                            } else {
+                                currentXml += buildXml(currentObj[key], newTagName);
+                            }
+                        }
+                    }
+                } else {
+                    currentXml += escapeXml(currentObj);
+                }
+                currentXml += `</${tagName}>`;
+                return currentXml;
+            }
+
+            xml = buildXml(obj, rootName);
+            return '<?xml version="1.0" encoding="UTF-8"?>\n' + xml;
+        }
+
+    </script>
+</body>
+</html>
