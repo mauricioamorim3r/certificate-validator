@@ -1667,69 +1667,852 @@ export default function ComprehensiveAnalysisForm() {
               </Card>
             </TabsContent>
 
-            {/* Add placeholder sections for the remaining tabs */}
+            {/* Section 9: Adjustment/Repair Analysis */}
             <TabsContent value="section9">
               <Card>
                 <CardHeader>
-                  <CardTitle>9. ANÁLISE DE AJUSTE / REPARO</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Wrench className="text-blue-600 mr-3" size={24} />
+                    9. ANÁLISE DE AJUSTE / REPARO
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Esta seção é fundamental para entender o histórico do instrumento e ações corretivas.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-blue-50">
+                          <th className="border border-gray-300 p-3 text-left">Aspecto</th>
+                          <th className="border border-gray-300 p-3 text-left">Status</th>
+                          <th className="border border-gray-300 p-3 text-left">Observações / Detalhamento</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Resultados "Como Encontrado" (As Found)</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Presentes"
+                                  checked={form.watch("asFoundStatus") === "Presentes"}
+                                  onChange={(e) => form.setValue("asFoundStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Presentes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Ausentes"
+                                  checked={form.watch("asFoundStatus") === "Ausentes"}
+                                  onChange={(e) => form.setValue("asFoundStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Ausentes
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Detalhar se há informações sobre o estado inicial do instrumento antes da calibração."
+                              {...form.register("asFoundObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Resultados "Como Deixado" (As Left)</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Presentes"
+                                  checked={form.watch("asLeftStatus") === "Presentes"}
+                                  onChange={(e) => form.setValue("asLeftStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Presentes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Ausentes"
+                                  checked={form.watch("asLeftStatus") === "Ausentes"}
+                                  onChange={(e) => form.setValue("asLeftStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Ausentes
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Detalhar o estado final após calibração/ajustes realizados."
+                              {...form.register("asLeftObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Ajustes Realizados Durante a Calibração</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("adjustmentsStatus") === "Sim"}
+                                  onChange={(e) => form.setValue("adjustmentsStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("adjustmentsStatus") === "Nao"}
+                                  onChange={(e) => form.setValue("adjustmentsStatus", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Se sim, especificar quais ajustes foram feitos e por que foram necessários."
+                              {...form.register("adjustmentsObs")} 
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4">
+                    <Label htmlFor="retroactiveActions">Ações Retroativas Necessárias (se houve ajustes)</Label>
+                    <Textarea 
+                      id="retroactiveActions"
+                      placeholder="Ex: Revisar medições realizadas nos últimos X meses; Avaliar impacto em processos críticos; etc."
+                      {...form.register("retroactiveActions")}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Section 10: Conformity Declaration and Decision Rules */}
             <TabsContent value="section10">
               <Card>
                 <CardHeader>
-                  <CardTitle>10. DECLARAÇÃO DE CONFORMIDADE E REGRAS DE DECISÃO</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Shield className="text-blue-600 mr-3" size={24} />
+                    10. DECLARAÇÃO DE CONFORMIDADE E REGRAS DE DECISÃO
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Seção crítica conforme Portaria INMETRO 291/2021. Verificar se há declaração clara de conformidade.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-blue-50">
+                          <th className="border border-gray-300 p-3 text-left">Critério</th>
+                          <th className="border border-gray-300 p-3 text-left">Status</th>
+                          <th className="border border-gray-300 p-3 text-left">Evidência / Observações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Declaração de Conformidade Presente</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("conformityDeclarationPresent") === "Sim"}
+                                  onChange={(e) => form.setValue("conformityDeclarationPresent", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("conformityDeclarationPresent") === "Nao"}
+                                  onChange={(e) => form.setValue("conformityDeclarationPresent", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="O certificado declara explicitamente se o instrumento está conforme ou não conforme com os requisitos especificados?"
+                              {...form.register("conformityDeclarationObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Limites de Especificação Definidos</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("specificationLimit") === "Sim"}
+                                  onChange={(e) => form.setValue("specificationLimit", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("specificationLimit") === "Nao"}
+                                  onChange={(e) => form.setValue("specificationLimit", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Os limites de especificação estão claramente definidos? Ex: ± 2% do valor lido ou ± 0.1 kPa"
+                              {...form.register("specificationLimitObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Regra de Decisão Aplicada</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("decisionRule") === "Sim"}
+                                  onChange={(e) => form.setValue("decisionRule", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("decisionRule") === "Nao"}
+                                  onChange={(e) => form.setValue("decisionRule", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="A regra de decisão para conformidade considera a incerteza de medição? Ex: Banda de Guarda ou Zona de Aceitação."
+                              {...form.register("decisionRuleObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Nível de Risco Declarado</td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("riskLevel") === "Sim"}
+                                  onChange={(e) => form.setValue("riskLevel", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("riskLevel") === "Nao"}
+                                  onChange={(e) => form.setValue("riskLevel", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="O risco associado à decisão de conformidade (ex: risco do consumidor/produtor) é especificado?"
+                              {...form.register("riskLevelObs")} 
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Section 11: Environmental Conditions Post-Calibration/Use */}
             <TabsContent value="section11">
               <Card>
                 <CardHeader>
-                  <CardTitle>11. CONDIÇÕES AMBIENTAIS DA CALIBRAÇÃO PÓS-CALIBRAÇÃO / USO</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Globe className="text-blue-600 mr-3" size={24} />
+                    11. CONDIÇÕES AMBIENTAIS DA CALIBRAÇÃO PÓS-CALIBRAÇÃO / USO
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Esta seção é crucial quando a calibração é realizada em condições diferentes do uso final do instrumento.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-blue-50">
+                          <th className="border border-gray-300 p-3 text-left">Parâmetro</th>
+                          <th className="border border-gray-300 p-3 text-left">Valor no Uso</th>
+                          <th className="border border-gray-300 p-3 text-left">Limite Aceitável (se houver)</th>
+                          <th className="border border-gray-300 p-3 text-left">OK?</th>
+                          <th className="border border-gray-300 p-3 text-left">Observações / Impacto no Uso</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Temperatura (°C)</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("tempUse")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="Ex: 25 ± 5 °C" {...form.register("tempUseLimit")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Checkbox 
+                              checked={form.watch("tempUseOk")}
+                              onCheckedChange={(checked) => form.setValue("tempUseOk", checked as boolean)}
+                            />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Avaliar a diferença entre condição de calibração e uso."
+                              {...form.register("tempUseObs")} 
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Umidade Relativa (%)</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("humidityUse")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="Ex: 60 ± 15 %" {...form.register("humidityUseLimit")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Checkbox 
+                              checked={form.watch("humidityUseOk")}
+                              onCheckedChange={(checked) => form.setValue("humidityUseOk", checked as boolean)}
+                            />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("humidityUseObs")} />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Pressão Atmosférica (kPa)</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("pressureUse")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="Ex: 100 ± 10 kPa" {...form.register("pressureUseLimit")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Checkbox 
+                              checked={form.watch("pressureUseOk")}
+                              onCheckedChange={(checked) => form.setValue("pressureUseOk", checked as boolean)}
+                            />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("pressureUseObs")} />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Fluido de Operação</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("fluidUse")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="Ex: Água / Ar Seco" {...form.register("fluidUseLimit")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Checkbox 
+                              checked={form.watch("fluidUseOk")}
+                              onCheckedChange={(checked) => form.setValue("fluidUseOk", checked as boolean)}
+                            />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Adequado para a aplicação do instrumento?"
+                              {...form.register("fluidUseObs")} 
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Section 12: Calibration Periodicity */}
             <TabsContent value="section12">
               <Card>
                 <CardHeader>
-                  <CardTitle>12. PERIODICIDADE DA CALIBRAÇÃO</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Calendar className="text-blue-600 mr-3" size={24} />
+                    12. PERIODICIDADE DA CALIBRAÇÃO
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-blue-50">
+                          <th className="border border-gray-300 p-3 text-left">Histórico</th>
+                          <th className="border border-gray-300 p-3 text-left">Data/Valor</th>
+                          <th className="border border-gray-300 p-3 text-left">Atende Periodicidade?</th>
+                          <th className="border border-gray-300 p-3 text-left">Justificativa / Comentário (foco na otimização)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Data Última Calibração</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input type="date" {...form.register("lastCalibrationDate")} />
+                          </td>
+                          <td className="border border-gray-300 p-3"></td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("lastCalibrationObs")} />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Intervalo Realizado</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="_____ meses" {...form.register("intervalRealized")} />
+                          </td>
+                          <td className="border border-gray-300 p-3"></td>
+                          <td className="border border-gray-300 p-3">
+                            <Input {...form.register("intervalRealizedObs")} />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-300 p-3 font-medium">Periodicidade Definida</td>
+                          <td className="border border-gray-300 p-3">
+                            <Input placeholder="_____ meses" {...form.register("periodicityDefined")} />
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Sim"
+                                  checked={form.watch("periodicityAtends") === "Sim"}
+                                  onChange={(e) => form.setValue("periodicityAtends", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Sim
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  value="Nao"
+                                  checked={form.watch("periodicityAtends") === "Nao"}
+                                  onChange={(e) => form.setValue("periodicityAtends", e.target.value as any)}
+                                  className="mr-2"
+                                />
+                                Não
+                              </label>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">
+                            <Input 
+                              placeholder="Análise de tendência ou impacto na periodicidade."
+                              {...form.register("periodicityObs")} 
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Section 13: Specific Evaluations by Instrument Type */}
             <TabsContent value="section13">
               <Card>
                 <CardHeader>
-                  <CardTitle>13. AVALIAÇÕES ESPECÍFICAS POR TIPO DE INSTRUMENTO</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Search className="text-blue-600 mr-3" size={24} />
+                    13. AVALIAÇÕES ESPECÍFICAS POR TIPO DE INSTRUMENTO
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Esta seção é onde o analista pode adicionar sua expertise para o tipo de instrumento.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="space-y-6">
+                    {/* Pressure Measurement Criteria */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">MEDIDORES DE PRESSÃO</h3>
+                      <div className="overflow-x-auto mb-4">
+                        <table className="w-full border-collapse border border-gray-300">
+                          <thead>
+                            <tr className="bg-blue-50">
+                              <th className="border border-gray-300 p-2 text-left text-xs">Critério</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Status</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Observações / Justificativa Técnica</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pressureCriteria.map((criteria, index) => (
+                              <tr key={index}>
+                                <td className="border border-gray-300 p-2">
+                                  <Input
+                                    placeholder="Nome do Critério"
+                                    value={criteria.name}
+                                    onChange={(e) => {
+                                      const newCriteria = [...pressureCriteria];
+                                      newCriteria[index].name = e.target.value;
+                                      setPressureCriteria(newCriteria);
+                                    }}
+                                    className="text-xs"
+                                  />
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <div className="flex space-x-2">
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="Sim"
+                                        checked={criteria.status === "Sim"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...pressureCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setPressureCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      Sim
+                                    </label>
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="Nao"
+                                        checked={criteria.status === "Nao"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...pressureCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setPressureCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      Não
+                                    </label>
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="N/A"
+                                        checked={criteria.status === "N/A"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...pressureCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setPressureCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      N/A
+                                    </label>
+                                  </div>
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <Input
+                                    value={criteria.observations}
+                                    onChange={(e) => {
+                                      const newCriteria = [...pressureCriteria];
+                                      newCriteria[index].observations = e.target.value;
+                                      setPressureCriteria(newCriteria);
+                                    }}
+                                    className="text-xs"
+                                  />
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <Button
+                                    type="button"
+                                    onClick={() => {
+                                      const newCriteria = pressureCriteria.filter((_, i) => i !== index);
+                                      setPressureCriteria(newCriteria);
+                                    }}
+                                    variant="outline"
+                                    size="sm"
+                                  >
+                                    <Trash2 size={12} />
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <Button 
+                        type="button" 
+                        onClick={() => setPressureCriteria([...pressureCriteria, { name: '', status: 'Sim', observations: '' }])}
+                        variant="outline"
+                      >
+                        <Plus className="mr-2" size={16} />
+                        Adicionar Critério Pressão
+                      </Button>
+                    </div>
+
+                    {/* Flow Measurement Criteria */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">MEDIDORES DE VAZÃO (conforme Portaria INMETRO 291/2021)</h3>
+                      <div className="overflow-x-auto mb-4">
+                        <table className="w-full border-collapse border border-gray-300">
+                          <thead>
+                            <tr className="bg-blue-50">
+                              <th className="border border-gray-300 p-2 text-left text-xs">Critério</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Status</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Observações / Justificativa Técnica</th>
+                              <th className="border border-gray-300 p-2 text-left text-xs">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {flowCriteria.map((criteria, index) => (
+                              <tr key={index}>
+                                <td className="border border-gray-300 p-2">
+                                  <Input
+                                    placeholder="Nome do Critério"
+                                    value={criteria.name}
+                                    onChange={(e) => {
+                                      const newCriteria = [...flowCriteria];
+                                      newCriteria[index].name = e.target.value;
+                                      setFlowCriteria(newCriteria);
+                                    }}
+                                    className="text-xs"
+                                  />
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <div className="flex space-x-2">
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="Sim"
+                                        checked={criteria.status === "Sim"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...flowCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setFlowCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      Sim
+                                    </label>
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="Nao"
+                                        checked={criteria.status === "Nao"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...flowCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setFlowCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      Não
+                                    </label>
+                                    <label className="flex items-center text-xs">
+                                      <input
+                                        type="radio"
+                                        value="N/A"
+                                        checked={criteria.status === "N/A"}
+                                        onChange={(e) => {
+                                          const newCriteria = [...flowCriteria];
+                                          newCriteria[index].status = e.target.value;
+                                          setFlowCriteria(newCriteria);
+                                        }}
+                                        className="mr-1"
+                                      />
+                                      N/A
+                                    </label>
+                                  </div>
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <Input
+                                    value={criteria.observations}
+                                    onChange={(e) => {
+                                      const newCriteria = [...flowCriteria];
+                                      newCriteria[index].observations = e.target.value;
+                                      setFlowCriteria(newCriteria);
+                                    }}
+                                    className="text-xs"
+                                  />
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  <Button
+                                    type="button"
+                                    onClick={() => {
+                                      const newCriteria = flowCriteria.filter((_, i) => i !== index);
+                                      setFlowCriteria(newCriteria);
+                                    }}
+                                    variant="outline"
+                                    size="sm"
+                                  >
+                                    <Trash2 size={12} />
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <Button 
+                        type="button" 
+                        onClick={() => setFlowCriteria([...flowCriteria, { name: '', status: 'Sim', observations: '' }])}
+                        variant="outline"
+                      >
+                        <Plus className="mr-2" size={16} />
+                        Adicionar Critério Vazão
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
+            {/* Section 14: Non-Conformities and Proposed Actions */}
             <TabsContent value="section14">
               <Card>
                 <CardHeader>
-                  <CardTitle>14. NÃO CONFORMIDADES E AÇÕES PROPOSTAS</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <AlertTriangle className="text-blue-600 mr-3" size={24} />
+                    14. NÃO CONFORMIDADES E AÇÕES PROPOSTAS
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Esta seção é crucial para um plano de ação. Ser claro e objetivo.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Seção em desenvolvimento...</p>
+                  <div className="overflow-x-auto mb-4">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-blue-50">
+                          <th className="border border-gray-300 p-2 text-left text-xs">Item</th>
+                          <th className="border border-gray-300 p-2 text-left text-xs">Descrição da Não Conformidade / Desvio</th>
+                          <th className="border border-gray-300 p-2 text-left text-xs">Criticidade</th>
+                          <th className="border border-gray-300 p-2 text-left text-xs">Ação Proposta / Responsável / Prazo Sugerido</th>
+                          <th className="border border-gray-300 p-2 text-left text-xs">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {nonConformities.map((nc, index) => (
+                          <tr key={index}>
+                            <td className="border border-gray-300 p-2">
+                              <Input
+                                type="number"
+                                value={nc.item}
+                                onChange={(e) => {
+                                  const newNCs = [...nonConformities];
+                                  newNCs[index].item = parseInt(e.target.value) || 1;
+                                  setNonConformities(newNCs);
+                                }}
+                                className="text-xs w-16"
+                              />
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              <Input
+                                value={nc.description}
+                                onChange={(e) => {
+                                  const newNCs = [...nonConformities];
+                                  newNCs[index].description = e.target.value;
+                                  setNonConformities(newNCs);
+                                }}
+                                className="text-xs"
+                              />
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              <Select
+                                value={nc.criticality}
+                                onValueChange={(value) => {
+                                  const newNCs = [...nonConformities];
+                                  newNCs[index].criticality = value;
+                                  setNonConformities(newNCs);
+                                }}
+                              >
+                                <SelectTrigger className="text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Alta">Alta</SelectItem>
+                                  <SelectItem value="Media">Média</SelectItem>
+                                  <SelectItem value="Baixa">Baixa</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              <Textarea
+                                value={nc.action}
+                                onChange={(e) => {
+                                  const newNCs = [...nonConformities];
+                                  newNCs[index].action = e.target.value;
+                                  setNonConformities(newNCs);
+                                }}
+                                className="text-xs min-h-[40px]"
+                              />
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              <Button
+                                type="button"
+                                onClick={() => removeNonConformity(index)}
+                                variant="outline"
+                                size="sm"
+                              >
+                                <Trash2 size={12} />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <Button type="button" onClick={addNonConformity} variant="outline" className="mb-4">
+                    <Plus className="mr-2" size={16} />
+                    Adicionar Não Conformidade
+                  </Button>
+
+                  <div>
+                    <Label htmlFor="additionalRecommendations">Recomendações Adicionais</Label>
+                    <Textarea 
+                      id="additionalRecommendations"
+                      placeholder="1. Recomendação 1&#10;2. Recomendação 2"
+                      {...form.register("additionalRecommendations")}
+                      className="mt-2"
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
