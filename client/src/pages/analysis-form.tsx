@@ -16,7 +16,9 @@ export default function AnalysisForm() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <IdCard className="text-blue-600 text-2xl mr-3" size={32} />
-              <h1 className="text-xl font-bold text-gray-900">Sistema de Análise Crítica</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                Sistema de Análise Crítica
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Usuário: {userInfo}</span>
@@ -29,14 +31,22 @@ export default function AnalysisForm() {
         </div>
       </header>
 
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--app-bg)' }}>
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: "var(--app-bg)" }}
+      >
         <div className="max-w-7xl mx-auto p-6">
           <ComprehensiveAnalysisForm />
 
           {/* Footer */}
           <footer className="text-center mt-8 text-sm text-gray-600">
-            <p>Sistema de Análise Crítica de Certificados v2.1 | Conforme Portaria INMETRO 291/2021 e ISO/IEC 17025</p>
-            <p className="mt-2">Desenvolvido para garantir a conformidade metrológica</p>
+            <p>
+              Sistema de Análise Crítica de Certificados v2.1 | Conforme
+              Portaria INMETRO 291/2021 e ISO/IEC 17025
+            </p>
+            <p className="mt-2">
+              Desenvolvido para garantir a conformidade metrológica
+            </p>
           </footer>
         </div>
       </div>

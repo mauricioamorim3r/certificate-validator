@@ -4,7 +4,11 @@ interface StatusSelectorProps {
   onChange: (value: string) => void;
 }
 
-export default function StatusSelector({ name, value, onChange }: StatusSelectorProps) {
+export default function StatusSelector({
+  name,
+  value,
+  onChange,
+}: StatusSelectorProps) {
   return (
     <div className="flex space-x-4 mt-2">
       <label className="status-conforme flex items-center">

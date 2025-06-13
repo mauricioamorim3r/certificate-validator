@@ -23,7 +23,7 @@
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
-  
+
   /* Custom app colors matching design reference */
   --app-bg: hsl(210, 25%, 95%);
   --app-surface: hsl(0, 0%, 100%);
@@ -92,7 +92,7 @@
     @apply inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-pointer transition-all duration-200;
   }
 
-  .status-radio-group input[type="radio"]:checked + label {
+  .status-radio-group input[type="radio"]:checked+label {
     background-color: var(--app-primary);
     color: white;
     border-color: var(--app-primary);
@@ -102,7 +102,7 @@
     @apply text-green-700 border-green-300 bg-green-50;
   }
 
-  .status-conforme input[type="radio"]:checked + label {
+  .status-conforme input[type="radio"]:checked+label {
     background-color: var(--app-success);
     border-color: var(--app-success);
   }
@@ -111,7 +111,7 @@
     @apply text-red-700 border-red-300 bg-red-50;
   }
 
-  .status-nao-conforme input[type="radio"]:checked + label {
+  .status-nao-conforme input[type="radio"]:checked+label {
     background-color: var(--app-danger);
     border-color: var(--app-danger);
   }
@@ -120,7 +120,7 @@
     @apply text-gray-700 border-gray-300 bg-gray-50;
   }
 
-  .status-nao-aplicavel input[type="radio"]:checked + label {
+  .status-nao-aplicavel input[type="radio"]:checked+label {
     background-color: var(--app-secondary);
     border-color: var(--app-secondary);
   }
