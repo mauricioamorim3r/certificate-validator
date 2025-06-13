@@ -2,7 +2,7 @@ import { useState } from "react";
 import { IdCard, Save, FolderOpen, Trash2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import ComprehensiveAnalysisForm from "@/components/comprehensive-analysis-form";
+import TestForm from "@/components/test-form";
 
 export default function AnalysisForm() {
   const { toast } = useToast();
@@ -31,7 +31,7 @@ export default function AnalysisForm() {
 
       <div className="min-h-screen" style={{ backgroundColor: 'var(--app-bg)' }}>
         <div className="max-w-7xl mx-auto p-6">
-          <ComprehensiveAnalysisForm />
+          <TestForm />
 
           {/* Footer */}
           <footer className="text-center mt-8 text-sm text-gray-600">
