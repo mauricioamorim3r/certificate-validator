@@ -37,6 +37,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import StatusSelector from "@/components/status-selector";
+import { AutoSaveIndicator } from "@/components/auto-save-indicator";
 
 // Definindo tipos específicos para melhor type safety
 type ConformityStatus = "Conforme" | "Nao Conforme";
@@ -289,6 +290,7 @@ export default function ComprehensiveAnalysisForm() {
   const [currentRecordId, setCurrentRecordId] = useState<number | null>(null);
   const [isoRequirements, setIsoRequirements] = useState<boolean[]>(new Array(10).fill(false));
   const [autoSaveStatus, setAutoSaveStatus] = useState<string>("Carregando...");
+  const [lastSaved, setLastSaved] = useState<Date | undefined>();
 
   // Salvamento automático no localStorage
   const saveToLocalStorage = (data: any) => {
@@ -305,7 +307,9 @@ export default function ComprehensiveAnalysisForm() {
         timestamp: new Date().toISOString()
       };
       localStorage.setItem('analysis-form-backup', JSON.stringify(saveData));
-      setAutoSaveStatus(`Salvo automaticamente às ${new Date().toLocaleTimeString()}`);
+      const now = new Date();
+      setLastSaved(now);
+      setAutoSaveStatus(`Salvo automaticamente às ${now.toLocaleTimeString()}`);
     } catch (error) {
       console.warn('Erro ao salvar backup:', error);
       setAutoSaveStatus('Erro ao salvar automaticamente');
@@ -598,7 +602,7 @@ export default function ComprehensiveAnalysisForm() {
 
   const loadLatestRecord = () => {
     if (allRecords && Array.isArray(allRecords) && allRecords.length > 0) {
-      const latestRecord = allRecords[0];
+      const latestRecord = allRecords[0] as any;
       setCurrentRecordId(latestRecord.id);
       
       // Set complex state with fallbacks
@@ -662,10 +666,12 @@ export default function ComprehensiveAnalysisForm() {
     }
   };
 
-  // Handle loading error
-  if (recordsError) {
-    console.error("Erro ao carregar registros:", recordsError);
-  }
+  // Handle loading error - suppress for now to prevent crashes
+  useEffect(() => {
+    if (recordsError) {
+      console.warn("Aviso: Erro ao carregar registros:", recordsError);
+    }
+  }, [recordsError]);
 
   return (
     <div className="app-container max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
@@ -762,7 +768,7 @@ export default function ComprehensiveAnalysisForm() {
               type="button" 
               onClick={loadLatestRecord}
               variant="outline"
-              disabled={!allRecords || allRecords.length === 0}
+              disabled={!allRecords || !Array.isArray(allRecords) || allRecords.length === 0}
             >
               <FolderOpen className="mr-2" size={16} />
               Carregar Último
@@ -2049,6 +2055,9 @@ export default function ComprehensiveAnalysisForm() {
             
           </Tabs>
         </form>
+        
+        {/* Auto-save indicator */}
+        <AutoSaveIndicator lastSaved={lastSaved} />
       </div>
     </div>
   );
