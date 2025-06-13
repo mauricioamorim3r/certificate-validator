@@ -37,17 +37,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new analysis record
   app.post("/api/analysis-records", async (req, res) => {
     try {
+      console.log("Received data:", JSON.stringify(req.body, null, 2));
       const validatedData = insertAnalysisRecordSchema.parse(req.body);
       const record = await storage.createAnalysisRecord(validatedData);
       res.status(201).json(record);
     } catch (error) {
+      console.error("Error creating record:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
+          message: "Erro de validação", 
+          errors: error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
         });
       }
-      res.status(500).json({ message: "Failed to create analysis record" });
+      res.status(500).json({ message: "Falha ao criar registro de análise", error: error.message });
     }
   });
 
