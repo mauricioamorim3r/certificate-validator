@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -248,11 +248,98 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+// Tipos para arrays
+interface Standard {
+  name: string;
+  certificate: string;
+  laboratory: string;
+  accreditation: string;
+  uncertainty: string;
+  validity: string;
+  status: string;
+  observations: string;
+}
+
+interface CalibrationResult {
+  point: string;
+  referenceValue: string;
+  measuredValue: string;
+  error: string;
+  uncertainty: string;
+  errorLimit: string;
+  ok: boolean;
+}
+
+interface NonConformity {
+  item: number;
+  description: string;
+  criticality: string;
+  action: string;
+}
+
+interface Criteria {
+  name: string;
+  status: string;
+  observations: string;
+}
+
 export default function ComprehensiveAnalysisForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentRecordId, setCurrentRecordId] = useState<number | null>(null);
   const [isoRequirements, setIsoRequirements] = useState<boolean[]>(new Array(10).fill(false));
+  const [autoSaveStatus, setAutoSaveStatus] = useState<string>("Carregando...");
+
+  // Salvamento automático no localStorage
+  const saveToLocalStorage = (data: any) => {
+    try {
+      const formData = form.getValues();
+      const saveData = {
+        ...formData,
+        isoRequirements,
+        standards,
+        calibrationResults,
+        nonConformities,
+        pressureCriteria,
+        flowCriteria,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('analysis-form-backup', JSON.stringify(saveData));
+      setAutoSaveStatus(`Salvo automaticamente às ${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      console.warn('Erro ao salvar backup:', error);
+      setAutoSaveStatus('Erro ao salvar automaticamente');
+    }
+  };
+
+  // Carregar dados do localStorage
+  const loadFromLocalStorage = () => {
+    try {
+      const saved = localStorage.getItem('analysis-form-backup');
+      if (saved) {
+        const data = JSON.parse(saved);
+        
+        if (data.isoRequirements) setIsoRequirements(data.isoRequirements);
+        if (data.standards) setStandards(data.standards);
+        if (data.calibrationResults) setCalibrationResults(data.calibrationResults);
+        if (data.nonConformities) setNonConformities(data.nonConformities);
+        if (data.pressureCriteria) setPressureCriteria(data.pressureCriteria);
+        if (data.flowCriteria) setFlowCriteria(data.flowCriteria);
+        
+        form.reset(data);
+        
+        toast({
+          title: "Dados Restaurados",
+          description: `Backup de ${new Date(data.timestamp).toLocaleString()} foi carregado.`,
+        });
+        
+        return true;
+      }
+    } catch (error) {
+      console.warn('Erro ao carregar backup:', error);
+    }
+    return false;
+  };
   
   // Estados para arrays com valores padrão seguros
   const [standards, setStandards] = useState<Standard[]>([{
@@ -334,15 +421,47 @@ export default function ComprehensiveAnalysisForm() {
     },
   });
 
-  const { data: allRecords, error: recordsError } = useQuery<AnalysisRecord[]>({
-    queryKey: ["comprehensive-analysis-records"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/analysis-records");
-      if (!response.ok) {
-        throw new Error("Falha ao carregar registros");
-      }
-      return response.json();
-    },
+  // Carregar dados salvos na inicialização
+  useEffect(() => {
+    const hasBackup = loadFromLocalStorage();
+    if (hasBackup) {
+      console.log('Backup carregado automaticamente');
+    }
+  }, []);
+
+  // Salvamento automático a cada mudança no formulário
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      saveToLocalStorage(form.getValues());
+    });
+    return () => subscription.unsubscribe();
+  }, [form, isoRequirements, standards, calibrationResults, nonConformities, pressureCriteria, flowCriteria]);
+
+  // Salvar antes de fechar a página
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      saveToLocalStorage(form.getValues());
+      e.preventDefault();
+      return "Tem certeza que deseja sair? Os dados foram salvos automaticamente.";
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [form, isoRequirements, standards, calibrationResults, nonConformities, pressureCriteria, flowCriteria]);
+
+  // Intervalo de salvamento a cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      saveToLocalStorage(form.getValues());
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [form, isoRequirements, standards, calibrationResults, nonConformities, pressureCriteria, flowCriteria]);
+
+  const { data: allRecords, error: recordsError } = useQuery({
+    queryKey: ["/api/analysis-records"],
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const saveRecordMutation = useMutation({
