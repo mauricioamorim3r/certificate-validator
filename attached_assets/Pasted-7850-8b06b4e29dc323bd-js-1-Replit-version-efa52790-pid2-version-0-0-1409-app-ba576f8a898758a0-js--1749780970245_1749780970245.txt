@@ -1,0 +1,51 @@
+7850-8b06b4e29dc323bd.js:1 Replit version efa52790, pid2 version 0.0.1409
+_app-ba576f8a898758a0.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-ba576f8a898758a0.js:38 [LaunchDarkly] LaunchDarkly client initialized
+framework-91cc880ccd62b6cc.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'battery'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-91cc880ccd62b6cc.js:1
+framework-91cc880ccd62b6cc.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-91cc880ccd62b6cc.js:1
