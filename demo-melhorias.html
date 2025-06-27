@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração - Melhorias na Ferramenta de Análise de Certificados</title>
+    <style>
+        :root {
+            --primary-blue: #033985;
+            --accent-yellow: #d4fc04;
+            --font-size-base: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0056b3 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(3, 57, 133, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-yellow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header .icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-yellow);
+            border-radius: 10px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .improvements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .improvement-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .improvement-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 12px 35px rgba(3, 57, 133, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .improvement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow));
+        }
+
+        .improvement-card h3 {
+            color: var(--primary-blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .improvement-card .card-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent-yellow);
+            border-radius: 8px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .improvement-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .improvement-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .improvement-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .color-demo {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .color-demo h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .color-palette {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .color-sample {
+            text-align: center;
+        }
+
+        .color-box {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .color-primary {
+            background: var(--primary-blue);
+        }
+
+        .color-accent {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+        }
+
+        .tabs-demo {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .tabs-demo h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tab-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .tab-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            background: white;
+            border: 2px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tab-item.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(3, 57, 133, 0.3);
+        }
+
+        .tab-item:hover:not(.active) {
+            background: #f8fafc;
+            box-shadow: 0 2px 8px rgba(3, 57, 133, 0.2);
+        }
+
+        .features-list {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 6px solid var(--primary-blue);
+            border-radius: 0 12px 12px 0;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .features-list h3 {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .btn-demo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0056b3 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(3, 57, 133, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(3, 57, 133, 0.4);
+        }
+
+        .btn-accent {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-accent:hover {
+            background: #c4ec00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 252, 4, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .improvements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-palette {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>
+                <span class="icon">📋</span>
+                Melhorias Implementadas na Ferramenta
+            </h1>
+            <p>Sistema de Análise Crítica de Certificados de Calibração - Versão Aprimorada</p>
+        </header>
+
+        <div class="color-demo">
+            <h2>🎨 Paleta de Cores Personalizada</h2>
+            <div class="color-palette">
+                <div class="color-sample">
+                    <div class="color-box color-primary">#033985</div>
+                    <p><strong>Azul Primário</strong><br>Cor principal da interface</p>
+                </div>
+                <div class="color-sample">
+                    <div class="color-box color-accent">#d4fc04</div>
+                    <p><strong>Amarelo Destaque</strong><br>Cor de acentuação</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="improvements-grid">
+            <div class="improvement-card">
+                <h3><span class="card-icon">🎨</span>Design Personalizado</h3>
+                <ul>
+                    <li>Aplicação das cores especificadas (#d4fc04 e #033985)</li>
+                    <li>Header personalizado com gradiente azul</li>
+                    <li>Bordas arredondadas em todos os elementos</li>
+                    <li>Sombras e efeitos visuais aprimorados</li>
+                    <li>Animações suaves de transição</li>
+                </ul>
+            </div>
+
+            <div class="improvement-card">
+                <h3><span class="card-icon">🖼️</span>Upload de Logo</h3>
+                <ul>
+                    <li>Funcionalidade para carregar logotipo personalizado</li>
+                    <li>Visualização em tempo real do logo</li>
+                    <li>Armazenamento local das configurações</li>
+                    <li>Interface intuitiva para upload</li>
+                    <li>Suporte a diferentes formatos de imagem</li>
+                </ul>
+            </div>
+
+            <div class="improvement-card">
+                <h3><span class="card-icon">✏️</span>Título Editável</h3>
+                <ul>
+                    <li>Edição do título do cabeçalho em tempo real</li>
+                    <li>Botão de edição integrado ao header</li>
+                    <li>Salvamento automático das alterações</li>
+                    <li>Interface de edição inline</li>
+                    <li>Persistência das configurações</li>
+                </ul>
+            </div>
+
+            <div class="improvement-card">
+                <h3><span class="card-icon">🔤</span>Controle de Fonte</h3>
+                <ul>
+                    <li>Ajuste dinâmico do tamanho da fonte (12px - 24px)</li>
+                    <li>Botões de incremento/decremento</li>
+                    <li>Indicador visual do tamanho atual</li>
+                    <li>Aplicação em toda a interface</li>
+                    <li>Configuração salva localmente</li>
+                </ul>
+            </div>
+
+            <div class="improvement-card">
+                <h3><span class="card-icon">📁</span>Abas Organizadas</h3>
+                <ul>
+                    <li>17 seções organizadas como abas de fichário</li>
+                    <li>Ícones coloridos para cada seção</li>
+                    <li>Layout responsivo e intuitivo</li>
+                    <li>Navegação simplificada entre seções</li>
+                    <li>Visual moderno tipo container</li>
+                </ul>
+            </div>
+
+            <div class="improvement-card">
+                <h3><span class="card-icon">📱</span>Interface Responsiva</h3>
+                <ul>
+                    <li>Adaptação automática para diferentes telas</li>
+                    <li>Layout otimizado para mobile e desktop</li>
+                    <li>Ajuste automático do tamanho da fonte</li>
+                    <li>Reorganização inteligente dos elementos</li>
+                    <li>Experiência consistente em todos os dispositivos</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tabs-demo">
+            <h2>📋 Demonstração das Abas Organizadas</h2>
+            <div class="tab-container">
+                <div class="tab-list">
+                    <div class="tab-item active">1. Cert.</div>
+                    <div class="tab-item">2. Acred.</div>
+                    <div class="tab-item">3. Instr.</div>
+                    <div class="tab-item">4. Amb.</div>
+                    <div class="tab-item">5. ISO</div>
+                    <div class="tab-item">6. Rastr.</div>
+                    <div class="tab-item">7. Incert.</div>
+                    <div class="tab-item">8. Result.</div>
+                    <div class="tab-item">9. Ajust.</div>
+                    <div class="tab-item">10. Conf.</div>
+                    <div class="tab-item">11. Uso</div>
+                    <div class="tab-item">12. Period.</div>
+                    <div class="tab-item">13. Espec.</div>
+                    <div class="tab-item">14. N.C.</div>
+                    <div class="tab-item">15. Final</div>
+                    <div class="tab-item">16. Assin.</div>
+                    <div class="tab-item">17. Anexos</div>
+                </div>
+                <p style="text-align: center; color: #666; font-style: italic;">
+                    Clique nas abas para navegar entre as diferentes seções do formulário
+                </p>
+            </div>
+        </div>
+
+        <div class="features-list">
+            <h3>🚀 Funcionalidades Implementadas</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div>
+                    <strong>✨ Visual:</strong>
+                    <ul style="margin-top: 8px;">
+                        <li>Cores personalizadas aplicadas</li>
+                        <li>Bordas arredondadas</li>
+                        <li>Gradientes e sombras</li>
+                        <li>Animações suaves</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>🛠️ Funcional:</strong>
+                    <ul style="margin-top: 8px;">
+                        <li>Upload de logotipo</li>
+                        <li>Edição de título</li>
+                        <li>Controle de fonte</li>
+                        <li>Navegação por abas</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>📱 Responsivo:</strong>
+                    <ul style="margin-top: 8px;">
+                        <li>Layout adaptativo</li>
+                        <li>Mobile-friendly</li>
+                        <li>Fonte escalável</li>
+                        <li>Interface otimizada</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 40px 0;">
+            <h3 style="color: var(--primary-blue); margin-bottom: 20px;">🎯 Demonstração dos Botões</h3>
+            <a href="#" class="btn-demo btn-primary">
+                💾 Salvar Registro
+            </a>
+            <a href="#" class="btn-demo btn-accent">
+                📚 Base Regulatória
+            </a>
+            <a href="#" class="btn-demo btn-primary">
+                🗑️ Limpar Formulário
+            </a>
+        </div>
+
+        <footer class="footer">
+            <h3 style="color: var(--primary-blue); margin-bottom: 15px;">
+                ✅ Implementação Concluída
+            </h3>
+            <p>
+                Todas as melhorias solicitadas foram implementadas com sucesso:<br>
+                <strong>Cores personalizadas</strong> • <strong>Upload de logo</strong> • <strong>Título editável</strong> • 
+                <strong>Controle de fonte</strong> • <strong>Abas organizadas</strong> • <strong>Design responsivo</strong>
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #888;">
+                Sistema pronto para uso em produção com interface moderna e funcional
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Adicionar interatividade às abas de demonstração
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Simular ajuste de fonte
+        let currentFontSize = 16;
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '+') {
+                e.preventDefault();
+                currentFontSize = Math.min(24, currentFontSize + 1);
+                document.documentElement.style.fontSize = currentFontSize + 'px';
+            } else if (e.ctrlKey && e.key === '-') {
+                e.preventDefault();
+                currentFontSize = Math.max(12, currentFontSize - 1);
+                document.documentElement.style.fontSize = currentFontSize + 'px';
+            }
+        });
+
+        // Adicionar efeito hover aos cards
+        document.querySelectorAll('.improvement-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

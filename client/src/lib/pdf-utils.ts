@@ -18,7 +18,7 @@ export function generatePDF(formData: any) {
     const content = generateTextReport(formData);
     downloadTextFile(
       content,
-      `analise_critica_${new Date().toISOString().split("T")[0]}.txt`,
+      `analise_critica_${new Date().toISOString().split("T")[0]}.txt`
     );
     return;
   }
@@ -66,7 +66,7 @@ export function generatePDF(formData: any) {
       const content = generateTextReport(formData);
       downloadTextFile(
         content,
-        `analise_critica_${new Date().toISOString().split("T")[0]}.txt`,
+        `analise_critica_${new Date().toISOString().split("T")[0]}.txt`
       );
     });
 }
@@ -82,7 +82,7 @@ Documento: ${formData.documentCode || "RAC-001"}
 Versão: ${formData.version || "2.1"}
 Data da Análise: ${formData.analysisDate || date}
 Analisado por: ${formData.analyzedBy || ""}
-Aprovado por: ${formData.approvedBy || ""}
+Cargo: ${formData.approvedBy || ""}
 
 IDENTIFICAÇÃO DO CERTIFICADO/LABORATÓRIO
 =========================================
@@ -90,7 +90,7 @@ Número do Certificado: ${formData.certificateNumber || ""}
 Laboratório Emissor: ${formData.issuingLaboratory || ""}
 Data de Emissão: ${formData.issueDate || ""}
 Data de Calibração: ${formData.calibrationDate || ""}
-Validade da Calibração: ${formData.calibrationValidity || ""}
+Data de Instalação: ${formData.installationDate || ""}
 Status da Validade: ${formData.validityStatus || ""}
 Observações da Validade: ${formData.validityObservations || ""}
 Responsável Técnico: ${formData.technicalResponsible || ""}
@@ -151,14 +151,56 @@ Observações Padrões: ${formData.standardsObservations || ""}
 Status dos Certificados: ${formData.certificatesStatus || ""}
 Observações Certificados: ${formData.certificatesObservations || ""}
 
+PADRÕES DE RASTREABILIDADE
+==========================
+${formData.standards && formData.standards.length > 0 
+  ? formData.standards.map((standard: any, index: number) => `
+${index + 1}. ${standard.name || "Não informado"}
+   Certificado: ${standard.certificate || "Não informado"}
+   Laboratório: ${standard.laboratory || "Não informado"}
+   Acreditação: ${standard.accreditation || "Não informado"}
+   Incerteza: ${standard.uncertainty || "Não informado"}
+   Validade: ${standard.validity || "Não informado"}
+   Status: ${standard.status || "N/A"}
+   Observações: ${standard.observations || "Nenhuma"}
+`).join("")
+  : "Nenhum padrão informado"}
+
+RESULTADOS DE CALIBRAÇÃO
+========================
+${formData.calibrationResults && formData.calibrationResults.length > 0
+  ? formData.calibrationResults.map((result: any, index: number) => `
+Ponto ${index + 1}: ${result.point || "N/A"}
+   Valor de Referência: ${result.referenceValue || "N/A"}
+   Valor Medido: ${result.measuredValue || "N/A"}
+   Erro: ${result.error || "N/A"}
+   Incerteza: ${result.uncertainty || "N/A"}
+   Limite de Erro: ${result.errorLimit || "N/A"}
+   Conforme: ${result.ok ? "Sim" : "Não"}
+   ${result.autoCalculated ? "(Calculado automaticamente)" : ""}
+`).join("")
+  : "Nenhum resultado informado"}
+
+NÃO CONFORMIDADES IDENTIFICADAS
+===============================
+${formData.nonConformities && formData.nonConformities.length > 0
+  ? formData.nonConformities.map((nc: any, index: number) => `
+${index + 1}. ${nc.description || "Descrição não informada"}
+   Criticidade: ${nc.criticality || "N/A"}
+   Ação Requerida: ${nc.action || "Não definida"}
+`).join("")
+  : "Nenhuma não conformidade identificada"}
+
 CONCLUSÃO DA ANÁLISE CRÍTICA
 =============================
 Status Geral: ${formData.overallStatus || ""}
 Comentários Finais: ${formData.finalComments || ""}
 
+========================================================
 Relatório gerado em: ${date}
 Sistema de Análise Crítica de Certificados v2.1
 Conforme Portaria INMETRO 291/2021 e ISO/IEC 17025
+========================================================
 `;
 }
 

@@ -1,27 +1,31 @@
-import { useEffect, useState } from 'react';
-import { Save, AlertCircle, CheckCircle } from 'lucide-react';
+import React from "react";
+import { useEffect, useState } from "react";
+import { Save, AlertCircle, CheckCircle } from "lucide-react";
 
 interface AutoSaveIndicatorProps {
   lastSaved?: Date;
   hasUnsavedChanges?: boolean;
 }
 
-export function AutoSaveIndicator({ lastSaved, hasUnsavedChanges }: AutoSaveIndicatorProps) {
-  const [status, setStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+export function AutoSaveIndicator({
+  lastSaved,
+  hasUnsavedChanges,
+}: AutoSaveIndicatorProps) {
+  const [status, setStatus] = useState<"saved" | "saving" | "error">("saved");
 
   useEffect(() => {
     if (hasUnsavedChanges) {
-      setStatus('saving');
-      const timer = setTimeout(() => setStatus('saved'), 1000);
+      setStatus("saving");
+      const timer = setTimeout(() => setStatus("saved"), 1000);
       return () => clearTimeout(timer);
     }
   }, [hasUnsavedChanges]);
 
   const getIcon = () => {
     switch (status) {
-      case 'saving':
+      case "saving":
         return <Save className="animate-pulse text-blue-500" size={16} />;
-      case 'error':
+      case "error":
         return <AlertCircle className="text-red-500" size={16} />;
       default:
         return <CheckCircle className="text-green-500" size={16} />;
@@ -30,14 +34,14 @@ export function AutoSaveIndicator({ lastSaved, hasUnsavedChanges }: AutoSaveIndi
 
   const getText = () => {
     switch (status) {
-      case 'saving':
-        return 'Salvando...';
-      case 'error':
-        return 'Erro ao salvar';
+      case "saving":
+        return "Salvando...";
+      case "error":
+        return "Erro ao salvar";
       default:
-        return lastSaved 
+        return lastSaved
           ? `Salvo ${lastSaved.toLocaleTimeString()}`
-          : 'Dados salvos';
+          : "Dados salvos";
     }
   };
 

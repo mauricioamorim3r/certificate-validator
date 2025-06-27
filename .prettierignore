@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.git
+*.log
+*.lock
+package-lock.json
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+coverage
+*.min.js
+*.min.css 

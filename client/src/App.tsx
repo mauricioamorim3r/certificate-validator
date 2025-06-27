@@ -1,26 +1,17 @@
-import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import AnalysisForm from "@/pages/analysis-form";
+import ComprehensiveAnalysisForm from "@/components/comprehensive-analysis-form";
 
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={AnalysisForm} />
-      <Route path="/analysis" component={AnalysisForm} />
-    </Switch>
-  );
-}
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+      <div className="App">
+        <ComprehensiveAnalysisForm />
         <Toaster />
-        <Router />
-      </TooltipProvider>
+      </div>
     </QueryClientProvider>
   );
 }

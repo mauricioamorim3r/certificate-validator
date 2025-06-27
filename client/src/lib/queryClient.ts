@@ -16,7 +16,7 @@ async function throwIfResNotOk(res: Response) {
 export async function apiRequest(
   method: string,
   url: string,
-  data?: unknown | undefined,
+  data?: unknown | undefined
 ): Promise<Response> {
   const res = await fetch(url, {
     method,
@@ -55,7 +55,7 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutos
       retry: (failureCount, error) => {
-        if (error.message.includes('401') || error.message.includes('403')) {
+        if (error.message.includes("401") || error.message.includes("403")) {
           return false;
         }
         return failureCount < 2;
@@ -63,7 +63,11 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: (failureCount, error) => {
-        if (error.message.includes('400') || error.message.includes('401') || error.message.includes('403')) {
+        if (
+          error.message.includes("400") ||
+          error.message.includes("401") ||
+          error.message.includes("403")
+        ) {
           return false;
         }
         return failureCount < 1;

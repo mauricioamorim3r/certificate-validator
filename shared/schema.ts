@@ -1,4 +1,11 @@
-import { pgTable, text, serial, timestamp, jsonb, varchar } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  timestamp,
+  jsonb,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -17,7 +24,7 @@ export const analysisRecords = pgTable("analysis_records", {
   analysisDate: text("analysis_date"),
   analyzedBy: text("analyzed_by"),
   approvedBy: text("approved_by"),
-  
+
   // Section 1: Certificate/Laboratory identification
   certificateNumber: text("certificate_number"),
   certificateNumberStatus: varchar("certificate_number_status", { length: 20 }),
@@ -31,21 +38,23 @@ export const analysisRecords = pgTable("analysis_records", {
   calibrationDate: text("calibration_date"),
   calibrationDateStatus: varchar("calibration_date_status", { length: 20 }),
   calibrationDateObs: text("calibration_date_obs"),
-  calibrationValidity: text("calibration_validity"),
+  installationDate: text("installation_date"),
   validityStatus: varchar("validity_status", { length: 20 }),
   validityObservations: text("validity_observations"),
   technicalResponsible: text("technical_responsible"),
   responsibleStatus: varchar("responsible_status", { length: 20 }),
   responsibleObservations: text("responsible_observations"),
-  
+
   // Section 2: Accreditation and scope
   accreditedLabStatus: varchar("accredited_lab_status", { length: 20 }),
   accreditedLabObservations: text("accredited_lab_observations"),
   adequateScopeStatus: varchar("adequate_scope_status", { length: 20 }),
   adequateScopeObservations: text("adequate_scope_observations"),
-  accreditationSymbolStatus: varchar("accreditation_symbol_status", { length: 20 }),
+  accreditationSymbolStatus: varchar("accreditation_symbol_status", {
+    length: 20,
+  }),
   accreditationSymbolObservations: text("accreditation_symbol_observations"),
-  
+
   // Section 3: Instrument identification
   equipmentType: text("equipment_type"),
   manufacturerModel: text("manufacturer_model"),
@@ -53,7 +62,7 @@ export const analysisRecords = pgTable("analysis_records", {
   tagIdInternal: text("tag_id_internal"),
   application: text("application"),
   location: text("location"),
-  
+
   // Section 4: Environmental conditions and calibration method
   tempReported: text("temp_reported"),
   tempLimit: text("temp_limit"),
@@ -77,13 +86,13 @@ export const analysisRecords = pgTable("analysis_records", {
   methodUsed: text("method_used"),
   methodUsedOk: text("method_used_ok"),
   methodUsedObs: text("method_used_obs"),
-  
+
   // Section 5: ISO/IEC 17025 essential elements checklist
   isoRequirements: jsonb("iso_requirements"),
-  
+
   // Section 6: Metrological traceability and uncertainty of standards
   standards: jsonb("standards"),
-  
+
   // Section 7: Measurement uncertainty evaluation
   uncertaintyDeclared: text("uncertainty_declared"),
   uncertaintyDeclaredOk: text("uncertainty_declared_ok"),
@@ -100,13 +109,13 @@ export const analysisRecords = pgTable("analysis_records", {
   compatibility: text("compatibility"),
   compatibilityOk: text("compatibility_ok"),
   compatibilityObs: text("compatibility_obs"),
-  
+
   // Section 8: Calibration results and operational range
   calibrationResults: jsonb("calibration_results"),
   calibrationRange: text("calibration_range"),
   operationalRange: text("operational_range"),
   resultsComments: text("results_comments"),
-  
+
   // Section 9: Adjustment/repair analysis
   asFoundStatus: varchar("as_found_status", { length: 20 }),
   asFoundObs: text("as_found_obs"),
@@ -115,9 +124,11 @@ export const analysisRecords = pgTable("analysis_records", {
   adjustmentsStatus: varchar("adjustments_status", { length: 20 }),
   adjustmentsObs: text("adjustments_obs"),
   retroactiveActions: text("retroactive_actions"),
-  
+
   // Section 10: Conformity declaration and decision rules
-  conformityDeclarationPresent: varchar("conformity_declaration_present", { length: 20 }),
+  conformityDeclarationPresent: varchar("conformity_declaration_present", {
+    length: 20,
+  }),
   conformityDeclarationObs: text("conformity_declaration_obs"),
   specificationLimit: varchar("specification_limit", { length: 20 }),
   specificationLimitObs: text("specification_limit_obs"),
@@ -125,7 +136,7 @@ export const analysisRecords = pgTable("analysis_records", {
   decisionRuleObs: text("decision_rule_obs"),
   riskLevel: varchar("risk_level", { length: 20 }),
   riskLevelObs: text("risk_level_obs"),
-  
+
   // Section 11: Environmental conditions post-calibration/use
   tempUse: text("temp_use"),
   tempUseLimit: text("temp_use_limit"),
@@ -143,7 +154,7 @@ export const analysisRecords = pgTable("analysis_records", {
   fluidUseLimit: text("fluid_use_limit"),
   fluidUseOk: text("fluid_use_ok"),
   fluidUseObs: text("fluid_use_obs"),
-  
+
   // Section 12: Calibration periodicity
   lastCalibrationDate: text("last_calibration_date"),
   lastCalibrationObs: text("last_calibration_obs"),
@@ -152,15 +163,15 @@ export const analysisRecords = pgTable("analysis_records", {
   periodicityDefined: text("periodicity_defined"),
   periodicityAtends: varchar("periodicity_atends", { length: 20 }),
   periodicityObs: text("periodicity_obs"),
-  
+
   // Section 13: Specific evaluations by instrument type
   pressureCriteria: jsonb("pressure_criteria"),
   flowCriteria: jsonb("flow_criteria"),
-  
+
   // Section 14: Non-conformities and proposed actions
   nonConformities: jsonb("non_conformities"),
   additionalRecommendations: text("additional_recommendations"),
-  
+
   // Section 15: Fitness for use and final conclusion
   errorLimits: varchar("error_limits", { length: 20 }),
   errorLimitsObs: text("error_limits_obs"),
@@ -170,13 +181,13 @@ export const analysisRecords = pgTable("analysis_records", {
   rtmRequirementsObs: text("rtm_requirements_obs"),
   finalStatus: varchar("final_status", { length: 30 }),
   conclusionJustification: text("conclusion_justification"),
-  
+
   // Section 16: Signatures
   analystName: text("analyst_name"),
   analystDate: text("analyst_date"),
   approverName: text("approver_name"),
   approverDate: text("approver_date"),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -186,7 +197,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertAnalysisRecordSchema = createInsertSchema(analysisRecords).omit({
+export const insertAnalysisRecordSchema = createInsertSchema(
+  analysisRecords
+).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -196,3 +209,68 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertAnalysisRecord = z.infer<typeof insertAnalysisRecordSchema>;
 export type AnalysisRecord = typeof analysisRecords.$inferSelect;
+
+// Schemas para tabelas regulatórias
+
+// 1. Incertezas máximas admissíveis dos sistemas de medição
+export const maxUncertaintySystemSchema = z.object({
+  id: z.number(),
+  measurementSystem: z.string(), // Sistema de medição
+  maxUncertainty: z.string(), // Incerteza máxima admitida
+  category: z.enum(["petroleum", "natural_gas"]), // Categoria
+  notes: z.string().optional(), // Observações
+});
+
+// 2. Incertezas máximas admitidas dos componentes
+export const maxUncertaintyComponentSchema = z.object({
+  id: z.number(),
+  component: z.string(), // Componente
+  meshUncertainty: z.string().optional(), // Incerteza da malha de medição
+  maxAdmittedUncertainty: z.string(), // Incerteza máxima admitida
+  repeatability: z.string().optional(), // Repetibilidade
+  notes: z.string().optional(), // Observações
+});
+
+// 3. Periodicidade de inspeções dos componentes
+export const inspectionPeriodicitySchema = z.object({
+  id: z.number(),
+  instrument: z.string(), // Instrumento de Medição
+  fiscal: z.string().optional(), // Fiscal
+  appropriation: z.string().optional(), // Apropriação
+  custodyTransferProduced: z.string().optional(), // Transferência de Custódia Produzido
+  custodyTransferProcessed: z.string().optional(), // Transferência de Custódia Processado
+  category: z.enum(["petroleum", "natural_gas"]), // Categoria
+});
+
+// 4. Periodicidade de calibração - gás natural
+export const calibrationPeriodicityGasSchema = z.object({
+  id: z.number(),
+  instrument: z.string(), // Instrumento de Medição
+  fiscal: z.string(), // Fiscal
+  appropriation: z.string(), // Apropriação
+  custodyTransferProduced: z.string(), // Transferência de Custódia Produzido
+  custodyTransferProcessed: z.string(), // Transferência de Custódia Processado
+});
+
+// 5. Periodicidade de calibração - petróleo
+export const calibrationPeriodicityPetroleumSchema = z.object({
+  id: z.number(),
+  instrumentAndMeasures: z.string(), // Instrumento de Medição e Medidas Materializadas
+  applicationType: z.string(), // Tipos de aplicações
+  fiscal: z.string(), // Fiscal
+  appropriation: z.string(), // Apropriação
+  custodyTransfer: z.string(), // Transferência de Custódia
+});
+
+// Tipos TypeScript derivados dos schemas regulatórios
+export type MaxUncertaintySystem = z.infer<typeof maxUncertaintySystemSchema>;
+export type MaxUncertaintyComponent = z.infer<
+  typeof maxUncertaintyComponentSchema
+>;
+export type InspectionPeriodicity = z.infer<typeof inspectionPeriodicitySchema>;
+export type CalibrationPeriodicityGas = z.infer<
+  typeof calibrationPeriodicityGasSchema
+>;
+export type CalibrationPeriodicityPetroleum = z.infer<
+  typeof calibrationPeriodicityPetroleumSchema
+>;

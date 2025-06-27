@@ -1,15 +1,25 @@
-import { users, analysisRecords, type User, type InsertUser, type AnalysisRecord, type InsertAnalysisRecord } from "@shared/schema";
+import {
+  users,
+  analysisRecords,
+  type User,
+  type InsertUser,
+  type AnalysisRecord,
+  type InsertAnalysisRecord,
+} from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Analysis records methods
   createAnalysisRecord(record: InsertAnalysisRecord): Promise<AnalysisRecord>;
   getAnalysisRecord(id: number): Promise<AnalysisRecord | undefined>;
   getAllAnalysisRecords(): Promise<AnalysisRecord[]>;
-  updateAnalysisRecord(id: number, record: Partial<InsertAnalysisRecord>): Promise<AnalysisRecord | undefined>;
+  updateAnalysisRecord(
+    id: number,
+    record: Partial<InsertAnalysisRecord>
+  ): Promise<AnalysisRecord | undefined>;
   deleteAnalysisRecord(id: number): Promise<boolean>;
 }
 
@@ -32,7 +42,7 @@ export class MemStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+      (user) => user.username === username
     );
   }
 
@@ -43,11 +53,22 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async createAnalysisRecord(record: InsertAnalysisRecord): Promise<AnalysisRecord> {
+  async createAnalysisRecord(
+    record: InsertAnalysisRecord
+  ): Promise<AnalysisRecord> {
     const id = this.currentRecordId++;
     const now = new Date();
+
+    // Convert undefined values to null to match AnalysisRecord type
+    const sanitizedRecord = Object.fromEntries(
+      Object.entries(record).map(([key, value]) => [
+        key,
+        value === undefined ? null : value,
+      ])
+    ) as any;
+
     const analysisRecord: AnalysisRecord = {
-      ...record,
+      ...sanitizedRecord,
       id,
       createdAt: now,
       updatedAt: now,
@@ -66,7 +87,10 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async updateAnalysisRecord(id: number, record: Partial<InsertAnalysisRecord>): Promise<AnalysisRecord | undefined> {
+  async updateAnalysisRecord(
+    id: number,
+    record: Partial<InsertAnalysisRecord>
+  ): Promise<AnalysisRecord | undefined> {
     const existing = this.analysisRecords.get(id);
     if (!existing) {
       return undefined;
