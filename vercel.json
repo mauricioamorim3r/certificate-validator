@@ -4,17 +4,7 @@
   "builds": [
     {
       "src": "server/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["server/**", "shared/**"]
-      }
-    },
-    {
-      "src": "client/src/main.tsx",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "client/dist"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -24,7 +14,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/$1"
+      "dest": "/index.html"
     }
   ],
   "outputDirectory": "client/dist",
