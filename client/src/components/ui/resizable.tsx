@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { GripVertical } from "lucide-react";
 import * as ResizablePrimitive from "react-resizable-panels";
 
@@ -25,7 +26,7 @@ const ResizableHandle = ({
   className,
   ...props
 }: React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
-  withHandle?: boolean;
+  withHandle?: boolean
 }) => (
   <ResizablePrimitive.PanelResizeHandle
     className={cn(
