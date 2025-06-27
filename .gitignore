@@ -4,7 +4,8 @@ node_modules
 .pnp.js
 
 # Production builds
-dist
+dist/
+!dist/public/
 build
 .next
 out
