@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "certificate-validator",
   "builds": [
     {
       "src": "server/index.ts",
@@ -14,15 +13,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/server/index.ts"
     }
-  ],
-  "outputDirectory": "client/dist",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": null,
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 } 
